@@ -34,7 +34,7 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
         init(context, attrs, defStyle);
     }
 
-    private void init(Context context, AttributeSet attrs, Integer defStyle) {
+    void init(Context context, AttributeSet attrs, Integer defStyle) {
         if (attrs == null) {
             return;
         }
@@ -47,10 +47,6 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
         }else {
             a = context.obtainStyledAttributes(attrs, R.styleable.BaseAutoFormatEditText);
         }
-
-        String maskString = a.getString(R.styleable.BaseAutoFormatEditText_mask);
-        String maskPlaceholder = a.getString(R.styleable.BaseAutoFormatEditText_mask_placeholder);
-        setMask(maskString, maskPlaceholder);
 
         CharSequence text = a.getText(R.styleable.BaseAutoFormatEditText_android_text);
         if (text != null && text.length() > 0) {
@@ -65,10 +61,8 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
         }
     }
 
-    abstract void setMask(String maskString, String maskPlaceholder);
-
     abstract EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
-    abstract void updateMaskString(String mask);
+    //abstract void updateMaskString(String mask);
 
     private void setUpTextWatcher() {
         removeTextChangedListener(textWatcher);
@@ -138,10 +132,6 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
         }
     }
 
-    public void reapplyMask() {
-        setText(rawText); //Re-masking after changing mask string value
-    }
-
     String getRawText() {
         return rawText;
     }
@@ -158,13 +148,6 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
     @BindingAdapter("rawText")
     public static void setRawText(BaseAutoFormatEditText editText, String rawText) {
         editText.setNewText(rawText);
-    }
-
-    //This works but is still experimental. Does not work properly if the mask is shorter than the masked text
-    @BindingAdapter("mask")
-    public static void setMask(BaseAutoFormatEditText editText, String maskString) {
-        editText.updateMaskString(maskString);
-        editText.reapplyMask();
     }
 
     @InverseBindingAdapter(attribute = "rawText", event = "android:textAttrChanged")

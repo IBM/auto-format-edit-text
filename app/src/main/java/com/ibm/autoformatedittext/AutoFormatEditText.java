@@ -1,7 +1,10 @@
 package com.ibm.autoformatedittext;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
+
+import androidx.databinding.BindingAdapter;
 
 public class AutoFormatEditText extends BaseAutoFormatEditText {
     private static final char DEFAULT_PLACEHOLDER = '#';
@@ -20,7 +23,24 @@ public class AutoFormatEditText extends BaseAutoFormatEditText {
     }
 
     @Override
-    void setMask(String maskString, String maskPlaceholder) {
+    void init(Context context, AttributeSet attrs, Integer defStyle) {
+        super.init(context, attrs, defStyle);
+
+        TypedArray a;
+        if (defStyle != null) {
+            a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText, defStyle, 0);
+        }else {
+            a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText);
+        }
+
+        String maskString = a.getString(R.styleable.AutoFormatEditText_mask);
+        String maskPlaceholder = a.getString(R.styleable.AutoFormatEditText_mask_placeholder);
+        setMask(maskString, maskPlaceholder);
+
+        a.recycle();
+    }
+
+    private void setMask(String maskString, String maskPlaceholder) {
         char placeholder = DEFAULT_PLACEHOLDER;
         if (maskPlaceholder != null && maskPlaceholder.length() > 0) {
             placeholder = maskPlaceholder.charAt(0);
@@ -29,7 +49,6 @@ public class AutoFormatEditText extends BaseAutoFormatEditText {
         this.mask = new Mask(maskString, placeholder);
     }
 
-    @Override
     void updateMaskString(String maskString) {
         mask.setMaskString(maskString);
     }
@@ -76,5 +95,16 @@ public class AutoFormatEditText extends BaseAutoFormatEditText {
         editTextState.setCursorPos(cursorPos);
 
         return editTextState;
+    }
+
+    public void reapplyMask() {
+        setText(getRawText()); //Re-masking after changing mask string value
+    }
+
+    //This works but is still experimental. Does not work properly if the mask is shorter than the masked text
+    @BindingAdapter("mask")
+    public static void setMask(AutoFormatEditText editText, String maskString) {
+        editText.updateMaskString(maskString);
+        editText.reapplyMask();
     }
 }
