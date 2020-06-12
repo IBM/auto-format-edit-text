@@ -52,22 +52,15 @@ public class AutoFormatEditText extends AbstractAutoEditText {
 
     @Override
     EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
-        EditTextState editTextState = new EditTextState();
-
         //Case where no mask exists, so the text can be entered without restriction
         if (mask.getMaskString() == null || mask.getMaskString().isEmpty()) {
-            editTextState.setMaskedText(textAfter);
-            editTextState.setUnmaskedText(textAfter);
-            editTextState.setCursor(selectionStart + replacementLength);
-            return editTextState;
+            return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
         }
 
         //Case where user is attempting to enter text beyond the length of the mask
         if (textAfter.length() > mask.getMaskString().length()) {
-            editTextState.setMaskedText(textBefore);
-            editTextState.setUnmaskedText(mask.unmaskText(textBefore, 0, textBefore.length()));
-            editTextState.setCursor(selectionStart);
-            return editTextState;
+            String newUnmaskedText = mask.unmaskText(textBefore, 0, textBefore.length());
+            return new EditTextState(textBefore, newUnmaskedText, selectionStart);
         }
 
         int selectionEnd = selectionStart + selectionLength;
@@ -83,15 +76,12 @@ public class AutoFormatEditText extends AbstractAutoEditText {
 
         int replacementEnd = selectionStart + replacementLength;
         String leftMidUnmaskedText = leftUnmasked + textAfter.subSequence(selectionStart, replacementEnd);
+
         String newRawText = leftMidUnmaskedText + rightUnmasked;
-
-        editTextState.setUnmaskedText(newRawText);
-        editTextState.setMaskedText(mask.maskText(newRawText));
-
+        String newMaskedText = mask.maskText(newRawText);
         int cursorPos = mask.maskText(leftMidUnmaskedText).length();
-        editTextState.setCursor(cursorPos);
 
-        return editTextState;
+        return new EditTextState(newMaskedText, newRawText, cursorPos);
     }
 
     //This works but is still experimental. Does not work properly if the mask is shorter than the masked text

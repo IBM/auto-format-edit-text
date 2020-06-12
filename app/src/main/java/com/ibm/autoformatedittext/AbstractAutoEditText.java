@@ -161,23 +161,26 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     }
 
     static class EditTextState {
-        private String unmaskedText, maskedText;
+        private String maskedText, unmaskedText;
         private int cursorStart, cursorEnd;
 
-        String getUnmaskedText() {
-            return unmaskedText;
+        EditTextState(String maskedText, String unmaskedText, int cursorStart, int cursorEnd) {
+            this.maskedText = maskedText;
+            this.unmaskedText = unmaskedText;
+            this.cursorStart = cursorStart;
+            this.cursorEnd = cursorEnd;
         }
 
-        void setUnmaskedText(String unmaskedText) {
-            this.unmaskedText = unmaskedText;
+        EditTextState(String maskedText, String unmaskedText, int cursorPos) {
+            this(maskedText, unmaskedText, cursorPos, cursorPos);
         }
 
         String getMaskedText() {
             return maskedText;
         }
 
-        void setMaskedText(String maskedText) {
-            this.maskedText = maskedText;
+        String getUnmaskedText() {
+            return unmaskedText;
         }
 
         int getCursorStart() {
@@ -186,16 +189,6 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
 
         int getCursorEnd() {
             return cursorEnd;
-        }
-
-        void setCursor(int cursorStart, int cursorEnd) {
-            this.cursorStart = cursorStart;
-            this.cursorEnd = cursorEnd;
-        }
-
-        void setCursor(int cursorPos) {
-            this.cursorStart = cursorPos;
-            this.cursorEnd = cursorPos;
         }
     }
 }
