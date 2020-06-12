@@ -58,7 +58,7 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         if (mask.getMaskString() == null || mask.getMaskString().isEmpty()) {
             editTextState.setMaskedText(textAfter);
             editTextState.setUnmaskedText(textAfter);
-            editTextState.setCursorPos(selectionStart + replacementLength);
+            editTextState.setCursorStart(selectionStart + replacementLength);
             return editTextState;
         }
 
@@ -66,7 +66,7 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         if (textAfter.length() > mask.getMaskString().length()) {
             editTextState.setMaskedText(textBefore);
             editTextState.setUnmaskedText(mask.unmaskText(textBefore, 0, textBefore.length()));
-            editTextState.setCursorPos(selectionStart);
+            editTextState.setCursorStart(selectionStart);
             return editTextState;
         }
 
@@ -89,7 +89,8 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         editTextState.setMaskedText(mask.maskText(newRawText));
 
         int cursorPos = mask.maskText(leftMidUnmaskedText).length();
-        editTextState.setCursorPos(cursorPos);
+        editTextState.setCursorStart(cursorPos);
+        editTextState.setCursorEnd(cursorPos);
 
         return editTextState;
     }

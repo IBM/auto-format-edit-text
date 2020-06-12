@@ -109,12 +109,14 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         EditTextState newEditTextState = format(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
         rawText = newEditTextState.getUnmaskedText(); //New raw text
         setText(newEditTextState.getMaskedText()); //Set new edit text string
-        setSelection(newEditTextState.getCursorPos()); //Setting text programmatically resets the cursor, so this will reposition it
+
+        //Setting text programmatically resets the cursor, so this will reposition it
+        setSelection(newEditTextState.getCursorStart(), newEditTextState.getCursorEnd());
 
         if (changeListener != null) {
             changeListener.onTextChanged(rawText,
                     newEditTextState.getMaskedText(),
-                    newEditTextState.getCursorPos());
+                    newEditTextState.getCursorStart());
         }
 
         addTextChangedListener(textWatcher);
@@ -160,7 +162,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
 
     static class EditTextState {
         private String unmaskedText, maskedText;
-        private int cursorPos;
+        private int cursorStart, cursorEnd;
 
         String getUnmaskedText() {
             return unmaskedText;
@@ -178,12 +180,20 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
             this.maskedText = maskedText;
         }
 
-        int getCursorPos() {
-            return cursorPos;
+        int getCursorStart() {
+            return cursorStart;
         }
 
-        void setCursorPos(int cursorPos) {
-            this.cursorPos = cursorPos;
+        void setCursorStart(int cursorStart) {
+            this.cursorStart = cursorStart;
+        }
+
+        int getCursorEnd() {
+            return cursorEnd;
+        }
+
+        void setCursorEnd(int cursorEnd) {
+            this.cursorEnd = cursorEnd;
         }
     }
 }
