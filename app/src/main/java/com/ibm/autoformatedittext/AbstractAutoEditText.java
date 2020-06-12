@@ -184,16 +184,18 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
             return cursorStart;
         }
 
-        void setCursorStart(int cursorStart) {
-            this.cursorStart = cursorStart;
-        }
-
         int getCursorEnd() {
             return cursorEnd;
         }
 
-        void setCursorEnd(int cursorEnd) {
+        void setCursor(int cursorStart, int cursorEnd) {
+            this.cursorStart = cursorStart;
             this.cursorEnd = cursorEnd;
+        }
+
+        void setCursor(int cursorPos) {
+            this.cursorStart = cursorPos;
+            this.cursorEnd = cursorPos;
         }
     }
 }
