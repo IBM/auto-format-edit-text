@@ -11,7 +11,7 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.InverseBindingAdapter;
 
-public abstract class BaseAutoFormatEditText extends AppCompatEditText {
+public abstract class AbstractAutoEditText extends AppCompatEditText {
     private AutoFormatTextChangeListener changeListener;
     private TextWatcher textWatcher;
     private boolean textChangeActive;
@@ -20,16 +20,16 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
     private String textBefore, textAfter;
     private int selectionStart, selectionLength, replacementLength;
 
-    public BaseAutoFormatEditText(Context context) {
+    public AbstractAutoEditText(Context context) {
         super(context);
     }
 
-    public BaseAutoFormatEditText(Context context, AttributeSet attrs) {
+    public AbstractAutoEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs, null);
     }
 
-    public BaseAutoFormatEditText(Context context, AttributeSet attrs, int defStyle) {
+    public AbstractAutoEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs, defStyle);
     }
@@ -43,12 +43,12 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
 
         TypedArray a;
         if (defStyle != null) {
-            a = context.obtainStyledAttributes(attrs, R.styleable.BaseAutoFormatEditText, defStyle, 0);
+            a = context.obtainStyledAttributes(attrs, R.styleable.AbstractAutoEditText, defStyle, 0);
         }else {
-            a = context.obtainStyledAttributes(attrs, R.styleable.BaseAutoFormatEditText);
+            a = context.obtainStyledAttributes(attrs, R.styleable.AbstractAutoEditText);
         }
 
-        CharSequence text = a.getText(R.styleable.BaseAutoFormatEditText_android_text);
+        CharSequence text = a.getText(R.styleable.AbstractAutoEditText_android_text);
         if (text != null && text.length() > 0) {
             setNewText(text);
         }
@@ -62,7 +62,6 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
     }
 
     abstract EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
-    //abstract void updateMaskString(String mask);
 
     private void setUpTextWatcher() {
         removeTextChangedListener(textWatcher);
@@ -141,17 +140,17 @@ public abstract class BaseAutoFormatEditText extends AppCompatEditText {
     }
 
     @BindingAdapter("android:text")
-    public static void setText(BaseAutoFormatEditText editText, String text) {
+    public static void setText(AbstractAutoEditText editText, String text) {
         editText.setNewText(text);
     }
 
     @BindingAdapter("rawText")
-    public static void setRawText(BaseAutoFormatEditText editText, String rawText) {
+    public static void setRawText(AbstractAutoEditText editText, String rawText) {
         editText.setNewText(rawText);
     }
 
     @InverseBindingAdapter(attribute = "rawText", event = "android:textAttrChanged")
-    public static String getText(BaseAutoFormatEditText editText) {
+    public static String getText(AbstractAutoEditText editText) {
         return editText.getRawText();
     }
 

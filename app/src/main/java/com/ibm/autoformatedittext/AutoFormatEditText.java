@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 
 import androidx.databinding.BindingAdapter;
 
-public class AutoFormatEditText extends BaseAutoFormatEditText {
+public class AutoFormatEditText extends AbstractAutoEditText {
     private static final char DEFAULT_PLACEHOLDER = '#';
     private Mask mask;
 
