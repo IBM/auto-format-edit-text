@@ -31,14 +31,6 @@ abstract class BaseFormattedTextBuilder {
 
     abstract void setMask(String mask);
 
-    void reset() {
-        setTextBeforeChange(null);
-        setTextAfterChange(null);
-        setSelectionStart(0);
-        setSelectionLength(0);
-        setReplacementLength(0);
-    }
-
     abstract EditTextState build();
 
     static class EditTextState {

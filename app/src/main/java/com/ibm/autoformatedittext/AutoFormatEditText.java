@@ -1,22 +1,11 @@
 package com.ibm.autoformatedittext;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.databinding.BindingAdapter;
-import androidx.databinding.InverseBindingAdapter;
-
-public class AutoFormatEditText extends AppCompatEditText {
-    private AutoFormatTextChangeListener changeListener;
-    private BaseFormattedTextBuilder formattedTextBuilder;
-    private TextWatcher textWatcher;
-    private boolean textChangeActive;
-    private String rawText = "";
+public class AutoFormatEditText extends BaseAutoFormatEditText {
+    private static final char DEFAULT_PLACEHOLDER = '#';
+    private Mask mask;
 
     public AutoFormatEditText(Context context) {
         super(context);
@@ -24,152 +13,68 @@ public class AutoFormatEditText extends AppCompatEditText {
 
     public AutoFormatEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs, null);
     }
 
     public AutoFormatEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context, attrs, defStyle);
-    }
-
-    private void init(Context context, AttributeSet attrs, Integer defStyle) {
-        if (attrs == null) {
-            return;
-        }
-
-        setUpTextWatcher();
-
-        TypedArray a;
-        if (defStyle != null) {
-            a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText, defStyle, 0);
-        }else {
-            a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText);
-        }
-
-        String maskString = a.getString(R.styleable.AutoFormatEditText_mask);
-        String maskPlaceholder = a.getString(R.styleable.AutoFormatEditText_mask_placeholder);
-        formattedTextBuilder = getMaskedTextBuilder(maskString, maskPlaceholder);
-
-        CharSequence text = a.getText(R.styleable.AutoFormatEditText_android_text);
-        if (text != null && text.length() > 0) {
-            setNewText(text);
-        }
-
-        a.recycle();
-
-        //Prevents edge case where multiple callbacks are occurring for input from edit texts with suggestions
-        if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)) {
-            setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        }
-    }
-
-    private void setUpTextWatcher() {
-        removeTextChangedListener(textWatcher);
-
-        textWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                textChangeActive = true;
-                formattedTextBuilder.setTextBeforeChange(s.toString());
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                handleOnTextChanged(s, start, before, count);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                handleAfterTextChanged();
-            }
-        };
-
-        addTextChangedListener(textWatcher);
     }
 
     @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        removeTextChangedListener(textWatcher);
-        textWatcher = null;
-    }
-
-    protected BaseFormattedTextBuilder getMaskedTextBuilder(String maskString, String maskPlaceholder) {
-        return MaskedTextBuilder.newInstance(maskString, maskPlaceholder);
-    }
-
-    private void handleOnTextChanged(CharSequence s, int start, int before, int count) {
-        if (textChangeActive) {
-            formattedTextBuilder.setTextAfterChange(s.toString())
-                    .setSelectionStart(start)
-                    .setSelectionLength(before)
-                    .setReplacementLength(count);
-        }
-    }
-
-    private void handleAfterTextChanged() {
-        removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
-
-        BaseFormattedTextBuilder.EditTextState editTextState = formattedTextBuilder.build();
-        rawText = editTextState.getUnmaskedText(); //New raw text
-        setText(editTextState.getMaskedText()); //Set new edit text string
-        setSelection(editTextState.getCursorPos()); //Setting text programmatically resets the cursor, so this will reposition it
-
-        if (changeListener != null) {
-            changeListener.onTextChanged(rawText,
-                    editTextState.getMaskedText(),
-                    editTextState.getCursorPos());
+    void setMask(String maskString, String maskPlaceholder) {
+        char placeholder = DEFAULT_PLACEHOLDER;
+        if (maskPlaceholder != null && maskPlaceholder.length() > 0) {
+            placeholder = maskPlaceholder.charAt(0);
         }
 
-        addTextChangedListener(textWatcher);
-        textChangeActive = false;
+        this.mask = new Mask(maskString, placeholder);
     }
 
-    public void setMask(String maskString) {
-        formattedTextBuilder.setMask(maskString);
-        setText(rawText); //Re-masking after changing mask string value
+    @Override
+    void updateMaskString(String maskString) {
+        mask.setMaskString(maskString);
     }
 
-    public void setNewText(CharSequence newText) {
-        if (newText == null) {
-            newText = "";
+    @Override
+    EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
+        EditTextState editTextState = new EditTextState();
+
+        //Case where no mask exists, so the text can be entered without restriction
+        if (mask.getMaskString() == null || mask.getMaskString().isEmpty()) {
+            editTextState.setMaskedText(textAfter);
+            editTextState.setUnmaskedText(textAfter);
+            editTextState.setCursorPos(selectionStart + replacementLength);
+            return editTextState;
         }
 
-        if (!rawText.equals(newText.toString())) {
-            setText(newText);
+        //Case where user is attempting to enter text beyond the length of the mask
+        if (textAfter.length() > mask.getMaskString().length()) {
+            editTextState.setMaskedText(textBefore);
+            editTextState.setUnmaskedText(mask.unmaskText(textBefore, 0, textBefore.length()));
+            editTextState.setCursorPos(selectionStart);
+            return editTextState;
         }
-    }
 
-    String getRawText() {
-        return rawText;
-    }
+        int selectionEnd = selectionStart + selectionLength;
+        String leftUnmasked = mask.unmaskText(textBefore, 0, selectionStart);
+        String rightUnmasked = mask.unmaskText(textBefore, selectionEnd, textBefore.length());
 
-    public void setOnChangeListener(AutoFormatTextChangeListener changeListener) {
-        this.changeListener = changeListener;
-    }
+        //Special case where user has backspaced in front of a non-masked character
+        //Remove next masked character
+        if (leftUnmasked.length() > 0 && leftUnmasked.length() <= mask.getUnmaskedLength() &&
+                !mask.isPlaceholder(selectionStart) && selectionLength == 1 && replacementLength == 0) {
+            leftUnmasked = leftUnmasked.substring(0, leftUnmasked.length() - 1);
+        }
 
-    @BindingAdapter("android:text")
-    public static void setText(AutoFormatEditText editText, String text) {
-        editText.setNewText(text);
-    }
+        int replacementEnd = selectionStart + replacementLength;
+        String leftMidUnmaskedText = leftUnmasked + textAfter.subSequence(selectionStart, replacementEnd);
+        String newRawText = leftMidUnmaskedText + rightUnmasked;
 
-    @BindingAdapter("rawText")
-    public static void setRawText(AutoFormatEditText editText, String rawText) {
-        editText.setNewText(rawText);
-    }
+        editTextState.setUnmaskedText(newRawText);
+        editTextState.setMaskedText(mask.maskText(newRawText));
 
-    //This works but is still experimental. Does not work properly if the mask is shorter than the masked text
-    @BindingAdapter("mask")
-    public static void setMask(AutoFormatEditText editText, String maskString) {
-        editText.setMask(maskString);
-    }
+        int cursorPos = mask.maskText(leftMidUnmaskedText).length();
+        editTextState.setCursorPos(cursorPos);
 
-    @InverseBindingAdapter(attribute = "rawText", event = "android:textAttrChanged")
-    public static String getText(AutoFormatEditText editText) {
-        return editText.getRawText();
-    }
-
-    public interface AutoFormatTextChangeListener {
-        void onTextChanged(String rawValue, String maskedValue, int position);
+        return editTextState;
     }
 }
