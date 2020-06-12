@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AutoFormatEditText">
+        <attr name="mask" format="string" />
+        <attr name="mask_placeholder" format="string" />
+        <attr name="android:text" />
+    </declare-styleable>
+</resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <data>
+        <variable name="observable" type="com.ibm.autoformatedittext.MaskObservable"/>
+    </data>
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mask"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:hint="+1(###) ###-####"
+            android:text="@={observable.mask}"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Masked value"/>
+        <com.ibm.autoformatedittext.AutoFormatEditText
+            android:id="@+id/phoneNumberAutoFormatEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:inputType="number"
+            app:mask="@{observable.mask}"
+            app:mask_placeholder="#"
+            android:text="@{observable.maskedText}"
+            app:rawText="@={observable.rawText}"
+            android:hint="+1(000) 000-0000"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Raw value"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:inputType="number"
+            android:hint="0000000000"
+            android:text="@={observable.rawText}"/>
+    </LinearLayout>
+</layout>
+
