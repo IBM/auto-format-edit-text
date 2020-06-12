@@ -12,13 +12,13 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.InverseBindingAdapter;
 
 public abstract class BaseAutoFormatEditText extends AppCompatEditText {
-    private String textBefore, textAfter;
-    private int selectionStart, selectionLength, replacementLength;
-
     private AutoFormatTextChangeListener changeListener;
     private TextWatcher textWatcher;
     private boolean textChangeActive;
     private String rawText = "";
+
+    private String textBefore, textAfter;
+    private int selectionStart, selectionLength, replacementLength;
 
     public BaseAutoFormatEditText(Context context) {
         super(context);
