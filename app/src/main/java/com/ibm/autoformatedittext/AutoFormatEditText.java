@@ -35,21 +35,18 @@ public class AutoFormatEditText extends BaseAutoFormatEditText {
 
         String maskString = a.getString(R.styleable.AutoFormatEditText_mask);
         String maskPlaceholder = a.getString(R.styleable.AutoFormatEditText_mask_placeholder);
-        setMask(maskString, maskPlaceholder);
 
-        a.recycle();
-    }
-
-    private void setMask(String maskString, String maskPlaceholder) {
         char placeholder = DEFAULT_PLACEHOLDER;
         if (maskPlaceholder != null && maskPlaceholder.length() > 0) {
             placeholder = maskPlaceholder.charAt(0);
         }
 
         this.mask = new Mask(maskString, placeholder);
+
+        a.recycle();
     }
 
-    void updateMaskString(String maskString) {
+    private void updateMaskString(String maskString) {
         mask.setMaskString(maskString);
     }
 
@@ -97,14 +94,10 @@ public class AutoFormatEditText extends BaseAutoFormatEditText {
         return editTextState;
     }
 
-    public void reapplyMask() {
-        setText(getRawText()); //Re-masking after changing mask string value
-    }
-
     //This works but is still experimental. Does not work properly if the mask is shorter than the masked text
     @BindingAdapter("mask")
     public static void setMask(AutoFormatEditText editText, String maskString) {
         editText.updateMaskString(maskString);
-        editText.reapplyMask();
+        editText.setText(editText.getRawText()); //Will cause re-masking
     }
 }
