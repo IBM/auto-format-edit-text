@@ -8,7 +8,7 @@ import androidx.databinding.BindingAdapter;
 
 public class AutoFormatEditText extends AbstractAutoEditText {
     private static final char DEFAULT_PLACEHOLDER = '#';
-    private Mask mask;
+    private Formatter formatter;
 
     public AutoFormatEditText(Context context) {
         super(context);
@@ -33,61 +33,60 @@ public class AutoFormatEditText extends AbstractAutoEditText {
             a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText);
         }
 
-        String maskString = a.getString(R.styleable.AutoFormatEditText_mask);
-        String maskPlaceholder = a.getString(R.styleable.AutoFormatEditText_mask_placeholder);
+        String format = a.getString(R.styleable.AutoFormatEditText_format);
+        String formatPlaceholder = a.getString(R.styleable.AutoFormatEditText_placeholder);
+        a.recycle();
 
         char placeholder = DEFAULT_PLACEHOLDER;
-        if (maskPlaceholder != null && maskPlaceholder.length() > 0) {
-            placeholder = maskPlaceholder.charAt(0);
+        if (formatPlaceholder != null && formatPlaceholder.length() > 0) {
+            placeholder = formatPlaceholder.charAt(0);
         }
 
-        this.mask = new Mask(maskString, placeholder);
-
-        a.recycle();
+        formatter = new Formatter(format, placeholder);
     }
 
-    private void updateMaskString(String maskString) {
-        mask.setMaskString(maskString);
+    private void updateFormatString(String formatString) {
+        formatter.setFormat(formatString);
     }
 
     @Override
     EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
         //Case where no mask exists, so the text can be entered without restriction
-        if (mask.getMaskString() == null || mask.getMaskString().isEmpty()) {
+        if (formatter.getFormat() == null || formatter.getFormat().isEmpty()) {
             return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
         }
 
         //Case where user is attempting to enter text beyond the length of the mask
-        if (textAfter.length() > mask.getMaskString().length()) {
-            String newUnmaskedText = mask.unmaskText(textBefore, 0, textBefore.length());
-            return new EditTextState(textBefore, newUnmaskedText, selectionStart);
+        if (textAfter.length() > formatter.getFormat().length()) {
+            String newUnformattedText = formatter.unformatText(textBefore, 0, textBefore.length());
+            return new EditTextState(textBefore, newUnformattedText, selectionStart);
         }
 
         int selectionEnd = selectionStart + selectionLength;
-        String leftUnmasked = mask.unmaskText(textBefore, 0, selectionStart);
-        String rightUnmasked = mask.unmaskText(textBefore, selectionEnd, textBefore.length());
+        String leftUnformatted = formatter.unformatText(textBefore, 0, selectionStart);
+        String rightUnformatted = formatter.unformatText(textBefore, selectionEnd, textBefore.length());
 
         //Special case where user has backspaced in front of a non-masked character
         //Remove next masked character
-        if (leftUnmasked.length() > 0 && leftUnmasked.length() <= mask.getUnmaskedLength() &&
-                !mask.isPlaceholder(selectionStart) && selectionLength == 1 && replacementLength == 0) {
-            leftUnmasked = leftUnmasked.substring(0, leftUnmasked.length() - 1);
+        if (leftUnformatted.length() > 0 && leftUnformatted.length() <= formatter.getUnformattedLength() &&
+                !formatter.isPlaceholder(selectionStart) && selectionLength == 1 && replacementLength == 0) {
+            leftUnformatted = leftUnformatted.substring(0, leftUnformatted.length() - 1);
         }
 
         int replacementEnd = selectionStart + replacementLength;
-        String leftMidUnmaskedText = leftUnmasked + textAfter.subSequence(selectionStart, replacementEnd);
+        String leftMidUnformattedText = leftUnformatted + textAfter.subSequence(selectionStart, replacementEnd);
 
-        String newRawText = leftMidUnmaskedText + rightUnmasked;
-        String newMaskedText = mask.maskText(newRawText);
-        int cursorPos = mask.maskText(leftMidUnmaskedText).length();
+        String newUnformattedText = leftMidUnformattedText + rightUnformatted;
+        String newFormattedText = formatter.formatText(newUnformattedText);
+        int cursorPos = formatter.formatText(leftMidUnformattedText).length();
 
-        return new EditTextState(newMaskedText, newRawText, cursorPos);
+        return new EditTextState(newFormattedText, newUnformattedText, cursorPos);
     }
 
     //This works but is still experimental. Does not work properly if the mask is shorter than the masked text
-    @BindingAdapter("mask")
-    public static void setMask(AutoFormatEditText editText, String maskString) {
-        editText.updateMaskString(maskString);
-        editText.setText(editText.getRawText()); //Will cause re-masking
+    @BindingAdapter("format")
+    public static void setFormat(AutoFormatEditText editText, String formatString) {
+        editText.updateFormatString(formatString);
+        editText.setText(editText.getUnformattedText()); //Will cause re-masking
     }
 }

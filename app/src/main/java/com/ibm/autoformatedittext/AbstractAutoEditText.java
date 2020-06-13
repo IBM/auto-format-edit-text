@@ -15,7 +15,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     private AutoFormatTextChangeListener changeListener;
     private TextWatcher textWatcher;
     private boolean textChangeActive;
-    private String rawText = "";
+    private String unformattedText = "";
 
     private String textBefore, textAfter;
     private int selectionStart, selectionLength, replacementLength;
@@ -107,15 +107,15 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
 
         EditTextState newEditTextState = format(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
-        rawText = newEditTextState.getUnmaskedText(); //New raw text
-        setText(newEditTextState.getMaskedText()); //Set new edit text string
+        unformattedText = newEditTextState.getUnformattedText(); //New unformatted text
+        setText(newEditTextState.getFormattedText()); //Set new edit text string
 
         //Setting text programmatically resets the cursor, so this will reposition it
         setSelection(newEditTextState.getCursorStart(), newEditTextState.getCursorEnd());
 
         if (changeListener != null) {
-            changeListener.onTextChanged(rawText,
-                    newEditTextState.getMaskedText(),
+            changeListener.onTextChanged(unformattedText,
+                    newEditTextState.getFormattedText(),
                     newEditTextState.getCursorStart());
         }
 
@@ -128,13 +128,13 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
             newText = "";
         }
 
-        if (!rawText.equals(newText.toString())) {
+        if (!unformattedText.equals(newText.toString())) {
             setText(newText);
         }
     }
 
-    String getRawText() {
-        return rawText;
+    String getUnformattedText() {
+        return unformattedText;
     }
 
     public void setOnChangeListener(AutoFormatTextChangeListener changeListener) {
@@ -153,34 +153,34 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
 
     @InverseBindingAdapter(attribute = "rawText", event = "android:textAttrChanged")
     public static String getText(AbstractAutoEditText editText) {
-        return editText.getRawText();
+        return editText.getUnformattedText();
     }
 
     public interface AutoFormatTextChangeListener {
-        void onTextChanged(String rawValue, String maskedValue, int position);
+        void onTextChanged(String unformattedText, String formattedText, int position);
     }
 
     static class EditTextState {
-        private String maskedText, unmaskedText;
+        private String formattedText, unformattedText;
         private int cursorStart, cursorEnd;
 
-        EditTextState(String maskedText, String unmaskedText, int cursorStart, int cursorEnd) {
-            this.maskedText = maskedText;
-            this.unmaskedText = unmaskedText;
+        EditTextState(String formattedText, String unformattedText, int cursorStart, int cursorEnd) {
+            this.formattedText = formattedText;
+            this.unformattedText = unformattedText;
             this.cursorStart = cursorStart;
             this.cursorEnd = cursorEnd;
         }
 
-        EditTextState(String maskedText, String unmaskedText, int cursorPos) {
-            this(maskedText, unmaskedText, cursorPos, cursorPos);
+        EditTextState(String formattedText, String unformattedText, int cursorPos) {
+            this(formattedText, unformattedText, cursorPos, cursorPos);
         }
 
-        String getMaskedText() {
-            return maskedText;
+        String getFormattedText() {
+            return formattedText;
         }
 
-        String getUnmaskedText() {
-            return unmaskedText;
+        String getUnformattedText() {
+            return unformattedText;
         }
 
         int getCursorStart() {

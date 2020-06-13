@@ -13,8 +13,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        MaskObservable observable = new MaskObservable();
-        observable.mask.set("+1(###) ###-####");
+        FormatObservable observable = new FormatObservable();
+        observable.format.set("+1(###) ###-####");
         binding.setObservable(observable);
     }
 }

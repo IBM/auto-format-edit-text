@@ -5,7 +5,7 @@
     </declare-styleable>
 
     <declare-styleable name="AutoFormatEditText">
-        <attr name="mask" format="string" />
-        <attr name="mask_placeholder" format="string" />
+        <attr name="format" format="string" />
+        <attr name="placeholder" format="string" />
     </declare-styleable>
 </resources>
