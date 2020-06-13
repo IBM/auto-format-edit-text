@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <data>
-        <variable name="observable" type="com.ibm.autoformatedittext.MaskObservable"/>
+        <variable name="observable" type="com.ibm.autoformatedittext.FormatObservable"/>
     </data>
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent"
@@ -12,29 +12,28 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mask"/>
+            android:text="Format"/>
         <androidx.appcompat.widget.AppCompatEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="+1(###) ###-####"
-            android:text="@={observable.mask}"/>
+            android:text="@={observable.format}"
+            android:hint="####" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Masked value"/>
+            android:text="Formatted value"/>
         <com.ibm.autoformatedittext.AutoFormatEditText
             android:id="@+id/phoneNumberAutoFormatEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:inputType="number"
-            app:mask="@{observable.mask}"
-            app:mask_placeholder="#"
-            android:text="@{observable.maskedText}"
-            app:rawText="@={observable.rawText}"
-            android:hint="+1(000) 000-0000"/>
+            android:text="@{observable.formattedText}"
+            app:format="@{observable.format}"
+            app:placeholder="#"
+            app:rawText="@={observable.rawText}"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,7 +43,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:inputType="number"
-            android:hint="0000000000"
             android:text="@={observable.rawText}"/>
     </LinearLayout>
 </layout>
