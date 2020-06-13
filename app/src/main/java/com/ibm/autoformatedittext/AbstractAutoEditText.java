@@ -169,7 +169,6 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         editText.setNewText(rawText);
     }
 
-    //Sets raw text value once edit text value changes
     @InverseBindingAdapter(attribute = "rawText", event = "android:textAttrChanged")
     public static String getText(AbstractAutoEditText editText) {
         return editText.getRawText();
