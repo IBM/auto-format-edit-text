@@ -3,7 +3,6 @@ package com.ibm.autoformatedittext;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -20,8 +19,6 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
 
     private String textBefore, textAfter;
     private int selectionStart, selectionLength, replacementLength;
-
-    private InputFilter[] inputFilters;
 
     public AbstractAutoEditText(Context context) {
         super(context);
@@ -52,31 +49,16 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         }
 
         CharSequence text = a.getText(R.styleable.AbstractAutoEditText_android_text);
-        a.recycle();
-
         if (text != null && text.length() > 0) {
             setNewText(text);
         }
 
-        inputFilters = getFilters();
+        a.recycle();
 
         //Prevents edge case where multiple callbacks are occurring for input from edit texts with suggestions
         if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)) {
             setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
-    }
-
-    public InputFilter[] getInputFilters() {
-        return inputFilters;
-    }
-
-    //Limits the length of the formatted string without affecting other filters from xml
-    //Multiple calls will not add more than one length filter, only the last one will be active
-    void setMaxLength(int maxLength) {
-        InputFilter[] newInputFilters = new InputFilter[inputFilters.length + 1];
-        System.arraycopy(inputFilters, 0, newInputFilters, 0, inputFilters.length);
-        newInputFilters[newInputFilters.length - 1] = new InputFilter.LengthFilter(maxLength);
-        setFilters(newInputFilters);
     }
 
     abstract EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);

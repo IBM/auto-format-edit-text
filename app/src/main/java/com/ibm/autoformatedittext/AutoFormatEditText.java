@@ -35,7 +35,6 @@ public class AutoFormatEditText extends AbstractAutoEditText {
 
         String maskString = a.getString(R.styleable.AutoFormatEditText_mask);
         String maskPlaceholder = a.getString(R.styleable.AutoFormatEditText_mask_placeholder);
-        a.recycle();
 
         char placeholder = DEFAULT_PLACEHOLDER;
         if (maskPlaceholder != null && maskPlaceholder.length() > 0) {
@@ -43,14 +42,12 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         }
 
         this.mask = new Mask(maskString, placeholder);
-        if (maskString != null) {
-            setMaxLength(maskString.length());
-        }
+
+        a.recycle();
     }
 
     private void updateMaskString(String maskString) {
         mask.setMaskString(maskString);
-        setMaxLength(maskString.length());
     }
 
     @Override
@@ -58,6 +55,12 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         //Case where no mask exists, so the text can be entered without restriction
         if (mask.getMaskString() == null || mask.getMaskString().isEmpty()) {
             return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
+        }
+
+        //Case where user is attempting to enter text beyond the length of the mask
+        if (textAfter.length() > mask.getMaskString().length()) {
+            String newUnmaskedText = mask.unmaskText(textBefore, 0, textBefore.length());
+            return new EditTextState(textBefore, newUnmaskedText, selectionStart);
         }
 
         int selectionEnd = selectionStart + selectionLength;
