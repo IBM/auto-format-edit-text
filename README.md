@@ -1,5 +1,31 @@
 # Android Auto Format EditText
-A consistent and customizable solution for automatic text field formatting (masking) in Android applications.
+A customizable solution for automatic text field formatting and masking in Android applications.
+
+## Example
+```xml
+<com.ibm.autoformatedittext.AutoFormatEditText
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@{viewModel.formattedText}"
+    app:format="(###) ###-####"
+    app:value="@={viewModel.rawText}"
+    app:placeholder="#" />
+```
+
+## Description
+
+The following describes in more detail all custom attributes used by AutoFormatEditText:
+* **text** - The formatted string content of the edit text
+* **format** - Used to derive the formatted string. The places for a user's input characters are denoted by a placeholder character (default is #). All other characters are literal and are inserted as the text changes. For example, a date format might be ##/##/####
+* **rawValue** - The unformatted value of the data entered into the text field. It can also be thought of the actual characters that the user types. For example, a date entered with the format ##/##/#### and the text 07/19/1993 would have a raw value of 07191993. This is also called the "unformatted text"
+* **placeholder** - An optional attribute specifying the character used by the text format to represent the user's inputed characters. This character MAY be inputted by the user without side effects
+
+| Attribute name  | Data binding support | Two-way data binding |
+| -------------   | -------------------- | -------------------- |
+| text            | yes                  | no                   |
+| format          | yes                  | no                   |
+| rawValue        | yes                  | yes                  |
+| placeholder     | no                   | no                   |
 
 <!-- License and Authors is optional here, but gives you the ability to highlight who is involed in the project -->
 ## License & Authors
