@@ -146,12 +146,12 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         editText.setNewText(text);
     }
 
-    @BindingAdapter("rawText")
-    public static void setRawText(AbstractAutoEditText editText, String rawText) {
-        editText.setNewText(rawText);
+    @BindingAdapter("rawValue")
+    public static void setRawText(AbstractAutoEditText editText, String rawValue) {
+        editText.setNewText(rawValue);
     }
 
-    @InverseBindingAdapter(attribute = "rawText", event = "android:textAttrChanged")
+    @InverseBindingAdapter(attribute = "rawValue", event = "android:textAttrChanged")
     public static String getText(AbstractAutoEditText editText) {
         return editText.getUnformattedText();
     }

@@ -11,7 +11,22 @@ class Formatter {
     }
 
     boolean isPlaceholder(int index) {
-        return format.charAt(index) == placeholder;
+        return index < format.length() && format.charAt(index) == placeholder;
+    }
+
+    boolean matches(String formattedString) {
+        if (format.length() != formattedString.length()) {
+            return false;
+        }
+
+        for (int i = 0; i < format.length(); i++) {
+            char currentChar = format.charAt(i);
+            if (currentChar != placeholder && currentChar != formattedString.charAt(i)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     int getUnformattedLength() {
