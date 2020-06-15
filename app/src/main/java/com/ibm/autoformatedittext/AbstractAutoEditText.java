@@ -15,9 +15,8 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     private AutoFormatTextChangeListener changeListener;
     private TextWatcher textWatcher;
     private boolean textChangeActive;
-    private String unformattedText = "";
 
-    private String textBefore, textAfter;
+    private String textBefore, textAfter, unformattedText;
     private int selectionStart, selectionLength, replacementLength;
 
     public AbstractAutoEditText(Context context) {
@@ -52,7 +51,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         a.recycle();
 
         if (text != null && text.length() > 0) {
-            setNewText(text);
+            setText(text);
         }
 
         //Prevents edge case where multiple callbacks are occurring for text input type
@@ -124,13 +123,23 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         textChangeActive = false;
     }
 
-    public void setNewText(CharSequence newText) {
-        if (newText == null) {
-            newText = "";
+    private void setNewText(CharSequence s) {
+        if (s == null) {
+            s = "";
         }
 
-        if (!unformattedText.equals(newText.toString())) {
-            setText(newText);
+        if (getText() != null && !getText().equals(s)) {
+            setText(s);
+        }
+    }
+
+    private void setUnformattedText(CharSequence s) {
+        if (s == null) {
+            s = "";
+        }
+
+        if (!s.toString().equals(unformattedText)) {
+            setText(s);
         }
     }
 
@@ -143,16 +152,21 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     }
 
     @BindingAdapter("android:text")
-    public static void setText(AbstractAutoEditText editText, String text) {
-        editText.setNewText(text);
+    public static void setTextAndroid(AbstractAutoEditText editText, String newText) {
+        editText.setNewText(newText);
     }
 
-    @BindingAdapter("rawValue")
-    public static void setRawText(AbstractAutoEditText editText, String rawValue) {
-        editText.setNewText(rawValue);
+    @BindingAdapter("text")
+    public static void setText(AbstractAutoEditText editText, String newText) {
+        editText.setNewText(newText);
     }
 
-    @InverseBindingAdapter(attribute = "rawValue", event = "android:textAttrChanged")
+    @BindingAdapter("unformattedText")
+    public static void setUnformattedText(AbstractAutoEditText editText, String unformattedText) {
+        editText.setUnformattedText(unformattedText);
+    }
+
+    @InverseBindingAdapter(attribute = "unformattedText", event = "android:textAttrChanged")
     public static String getText(AbstractAutoEditText editText) {
         return editText.getUnformattedText();
     }
