@@ -45,8 +45,9 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         formatter = new Formatter(format, placeholder);
     }
 
-    private void updateFormatString(String formatString) {
-        formatter.setFormat(formatString);
+    private void setFormat(String format) {
+        formatter.setFormat(format);
+        setText(getUnformattedText()); //Will cause re-formatting
     }
 
     @Override
@@ -85,8 +86,7 @@ public class AutoFormatEditText extends AbstractAutoEditText {
     }
 
     @BindingAdapter("format")
-    public static void setFormat(AutoFormatEditText editText, String formatString) {
-        editText.updateFormatString(formatString);
-        editText.setText(editText.getUnformattedText()); //Will cause re-formatting
+    public static void setFormat(AutoFormatEditText editText, String format) {
+        editText.setFormat(format);
     }
 }
