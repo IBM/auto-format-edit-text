@@ -51,12 +51,12 @@ public class AutoFormatEditText extends AbstractAutoEditText {
 
     @Override
     EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
-        //Case where no mask exists, so the text can be entered without restriction
+        //Case where no format exists, so the text can be entered without restriction
         if (formatter.getFormat() == null || formatter.getFormat().isEmpty()) {
             return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
         }
 
-        //Case where user is attempting to enter text beyond the length of the mask
+        //Case where user is attempting to enter text beyond the length of the format
         if (textAfter.length() > formatter.getFormat().length()
             && selectionLength != replacementLength && selectionStart > 0
             && !formatter.matches(textAfter)) {
@@ -68,8 +68,8 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         String leftUnformatted = formatter.unformatText(textBefore, 0, selectionStart);
         String rightUnformatted = formatter.unformatText(textBefore, selectionStart + selectionLength, textBefore.length());
 
-        //Special case where user has backspaced in front of a non-masked character
-        //Remove next masked character
+        //Special case where user has backspaced in front of a character dictated by the format
+        //Remove next character not dictated by the format
         if (leftUnformatted.length() > 0 &&
                 leftUnformatted.length() <= formatter.getUnformattedLength() &&
                 !formatter.isPlaceholder(selectionStart) &&
@@ -84,10 +84,9 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         return new EditTextState(newFormattedText, newUnformattedText, cursorPos);
     }
 
-    //This works but is still experimental. Does not work properly if the mask is shorter than the masked text
     @BindingAdapter("format")
     public static void setFormat(AutoFormatEditText editText, String formatString) {
         editText.updateFormatString(formatString);
-        editText.setText(editText.getUnformattedText()); //Will cause re-masking
+        editText.setText(editText.getUnformattedText()); //Will cause re-formatting
     }
 }
