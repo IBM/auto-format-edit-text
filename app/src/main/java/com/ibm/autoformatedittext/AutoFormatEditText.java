@@ -57,28 +57,29 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         }
 
         //Case where user is attempting to enter text beyond the length of the mask
-        if (textAfter.length() > formatter.getFormat().length()) {
-            String newUnformattedText = formatter.unformatText(textBefore, 0, textBefore.length());
-            return new EditTextState(textBefore, newUnformattedText, selectionStart);
+        if (textAfter.length() > formatter.getFormat().length()
+            && selectionLength != replacementLength && selectionStart > 0
+            && !formatter.matches(textAfter)) {
+                String newUnformattedText = formatter.unformatText(textBefore, 0, textBefore.length());
+                return new EditTextState(textBefore, newUnformattedText, selectionStart);
         }
 
-        int selectionEnd = selectionStart + selectionLength;
+        CharSequence insertedText = textAfter.subSequence(selectionStart, selectionStart + replacementLength);
         String leftUnformatted = formatter.unformatText(textBefore, 0, selectionStart);
-        String rightUnformatted = formatter.unformatText(textBefore, selectionEnd, textBefore.length());
+        String rightUnformatted = formatter.unformatText(textBefore, selectionStart + selectionLength, textBefore.length());
 
         //Special case where user has backspaced in front of a non-masked character
         //Remove next masked character
-        if (leftUnformatted.length() > 0 && leftUnformatted.length() <= formatter.getUnformattedLength() &&
-                !formatter.isPlaceholder(selectionStart) && selectionLength == 1 && replacementLength == 0) {
+        if (leftUnformatted.length() > 0 &&
+                leftUnformatted.length() <= formatter.getUnformattedLength() &&
+                !formatter.isPlaceholder(selectionStart) &&
+                selectionLength == 1 && replacementLength == 0) {
             leftUnformatted = leftUnformatted.substring(0, leftUnformatted.length() - 1);
         }
 
-        int replacementEnd = selectionStart + replacementLength;
-        String leftMidUnformattedText = leftUnformatted + textAfter.subSequence(selectionStart, replacementEnd);
-
-        String newUnformattedText = leftMidUnformattedText + rightUnformatted;
+        String newUnformattedText = leftUnformatted + insertedText + rightUnformatted;
         String newFormattedText = formatter.formatText(newUnformattedText);
-        int cursorPos = formatter.formatText(leftMidUnformattedText).length();
+        int cursorPos = formatter.formatText(leftUnformatted + insertedText).length();
 
         return new EditTextState(newFormattedText, newUnformattedText, cursorPos);
     }
