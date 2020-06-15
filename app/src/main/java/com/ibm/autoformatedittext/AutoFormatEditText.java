@@ -52,7 +52,7 @@ public class AutoFormatEditText extends AbstractAutoEditText {
     @Override
     EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
         //Case where no format exists, so the text can be entered without restriction
-        if (formatter.getFormat() == null || formatter.getFormat().isEmpty()) {
+        if (formatter == null || formatter.getFormat() == null || formatter.getFormat().isEmpty()) {
             return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
         }
 
