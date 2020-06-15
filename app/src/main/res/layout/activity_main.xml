@@ -33,7 +33,7 @@
             android:text="@{observable.formattedText}"
             app:format="@{observable.format}"
             app:placeholder="#"
-            app:rawText="@={observable.rawText}"/>
+            app:rawValue="@={observable.rawValue}"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:inputType="number"
-            android:text="@={observable.rawText}"/>
+            android:text="@={observable.rawValue}"/>
     </LinearLayout>
 </layout>
 
