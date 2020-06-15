@@ -1,20 +1,38 @@
 package com.ibm.autoformatedittext;
 
+@SuppressWarnings("WeakerAccess")
 class Formatter {
     private char placeholder;
     private String format;
     private Integer unformattedLength;
 
-    Formatter(String format, char placeholder) {
+    public Formatter(String format, char placeholder) {
         this.format = format;
         this.placeholder = placeholder;
     }
 
-    boolean isPlaceholder(int index) {
-        return format.charAt(index) == placeholder;
+    //Returns true if the character in the format at the specified index is the placeholder character
+    public boolean isPlaceholder(int index) {
+        return index < format.length() && format.charAt(index) == placeholder;
     }
 
-    int getUnformattedLength() {
+    //Returns true if the specified string matches the format
+    public boolean matches(String formattedString) {
+        if (format.length() != formattedString.length()) {
+            return false;
+        }
+
+        for (int i = 0; i < format.length(); i++) {
+            char currentChar = format.charAt(i);
+            if (currentChar != placeholder && currentChar != formattedString.charAt(i)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public int getUnformattedLength() {
         if (unformattedLength == null) {
             unformattedLength = 0;
 
@@ -28,7 +46,7 @@ class Formatter {
         return unformattedLength;
     }
 
-    String formatText(String unformattedText) {
+    public String formatText(String unformattedText) {
         StringBuilder builder = new StringBuilder();
 
         if (unformattedText.length() == 0) {
@@ -52,7 +70,7 @@ class Formatter {
         return builder.toString();
     }
 
-    String unformatText(CharSequence formattedText, int start, int end) {
+    public String unformatText(CharSequence formattedText, int start, int end) {
         StringBuilder builder = new StringBuilder();
 
         if (formattedText.length() > 0) {
@@ -66,11 +84,11 @@ class Formatter {
         return builder.toString();
     }
 
-    String getFormat() {
+    public String getFormat() {
         return format;
     }
 
-    void setFormat(String format) {
+    public void setFormat(String format) {
         this.format = format;
         this.unformattedLength = null;
     }

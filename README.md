@@ -7,8 +7,8 @@ A customizable solution for automatic text field formatting and masking in Andro
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="@{viewModel.formattedText}"
-    app:format="(###) ###-####"
-    app:rawValue="@={viewModel.unformattedText}"
+    app:unformattedText="@={viewModel.unformattedText}"
+    app:format="##/##/####"
     app:placeholder="#" />
 ```
 
@@ -16,16 +16,18 @@ A customizable solution for automatic text field formatting and masking in Andro
 
 The following describes in more detail all custom attributes used by AutoFormatEditText:
 * **text** - The formatted string content of the edit text
-* **format** - Used to derive the formatted string. The places for a user's input characters are denoted by a placeholder character (default is #). All other characters are literal and are inserted as the text changes. For example, a date format might be ##/##/####
-* **rawValue** - The unformatted value of the data entered into the text field. It can also be thought of the actual characters that the user types. For example, a date entered with the format ##/##/#### and the text 07/19/1993 would have a raw value of 07191993. This is also called the "unformatted text"
-* **placeholder** - An optional attribute specifying the character used by the text format to represent the user's inputed characters. This character MAY be inputted by the user without side effects
+* **unformattedText** - The unformatted string content of the edit text. It can also be thought of the actual characters that the user has entered. For example, a date entered with the format ##/##/#### and the text 07/19/1993 would have an unformatted value of 07191993. This is also called the "raw text".
+* **format** - Used to derive the formatted string. Slots for a user's input characters are denoted by a placeholder. All other characters are literal and are inserted as the text changes. For example, a date format might be ##/##/####
+* **placeholder** - An optional attribute specifying the character used by the text format to represent the user's input characters (default is #)
 
 | Attribute name  | Data binding support | Two-way data binding |
 | -------------   | -------------------- | -------------------- |
-| text            | yes                  | no                   |
+| text            | yes                  | yes*                 |
+| unformattedText | yes                  | yes*                 |
 | format          | yes                  | no                   |
-| rawValue        | yes                  | yes                  |
 | placeholder     | no                   | no                   |
+
+*Two-way data binding will only work for one attribute or the other, but not both
 
 <!-- License and Authors is optional here, but gives you the ability to highlight who is involed in the project -->
 ## License & Authors
