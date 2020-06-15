@@ -49,14 +49,15 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         }
 
         CharSequence text = a.getText(R.styleable.AbstractAutoEditText_android_text);
+        a.recycle();
+
         if (text != null && text.length() > 0) {
             setNewText(text);
         }
 
-        a.recycle();
-
-        //Prevents edge case where multiple callbacks are occurring for input from edit texts with suggestions
-        if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE)) {
+        //Prevents edge case where multiple callbacks are occurring for text input type
+        if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE) ||
+                getInputType() == InputType.TYPE_CLASS_TEXT || getInputType() == InputType.TYPE_TEXT_FLAG_MULTI_LINE) {
             setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
     }
