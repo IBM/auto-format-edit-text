@@ -1,2 +1,3 @@
 rootProject.name='AutoFormatEditText'
 include ':app'
+include ':lib'
