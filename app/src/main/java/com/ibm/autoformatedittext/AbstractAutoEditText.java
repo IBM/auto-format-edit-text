@@ -9,52 +9,47 @@ import android.util.AttributeSet;
 
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.databinding.BindingAdapter;
-import androidx.databinding.InverseBindingAdapter;
+import androidx.databinding.BindingMethod;
+import androidx.databinding.BindingMethods;
 
+@BindingMethods({
+        @BindingMethod(type = AbstractAutoEditText.class, attribute = "onTextChanged", method = "setTextChangedListener"),
+        @BindingMethod(type = AbstractAutoEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")
+})
 public abstract class AbstractAutoEditText extends AppCompatEditText {
-    private AutoFormatTextChangeListener changeListener;
+    private UnformattedValueListener onUnformattedValueListener;
+    private TextChangedListener onTextChangedListener;
+
     private TextWatcher textWatcher;
     private boolean textChangeActive;
 
-    private String textBefore, textAfter, unformattedText;
+    private String textBefore, textAfter, formattedText, unformattedText;
     private int selectionStart, selectionLength, replacementLength;
 
     public AbstractAutoEditText(Context context) {
         super(context);
+        init(context, null);
     }
 
     public AbstractAutoEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs, null);
+        init(context, attrs);
     }
 
-    public AbstractAutoEditText(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        init(context, attrs, defStyle);
-    }
-
-    void init(Context context, AttributeSet attrs, Integer defStyle) {
-        if (attrs == null) {
-            return;
-        }
-
+    void init(Context context, AttributeSet attrs) {
         setUpTextWatcher();
 
-        TypedArray a;
-        if (defStyle != null) {
-            a = context.obtainStyledAttributes(attrs, R.styleable.AbstractAutoEditText, defStyle, 0);
-        }else {
-            a = context.obtainStyledAttributes(attrs, R.styleable.AbstractAutoEditText);
+        if (attrs != null) {
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AbstractAutoEditText);
+            CharSequence text = a.getText(R.styleable.AbstractAutoEditText_android_text);
+            a.recycle();
+
+            if (text != null && text.length() > 0) {
+                setText(text);
+            }
         }
 
-        CharSequence text = a.getText(R.styleable.AbstractAutoEditText_android_text);
-        a.recycle();
-
-        if (text != null && text.length() > 0) {
-            setText(text);
-        }
-
-        //Prevents edge case where multiple callbacks are occurring for text input type
+        //Prevents edge case where multiple callbacks are occurring for input type 'text'
         if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE) ||
                 getInputType() == InputType.TYPE_CLASS_TEXT || getInputType() == InputType.TYPE_TEXT_FLAG_MULTI_LINE) {
             setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
@@ -69,8 +64,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                textChangeActive = true;
-                textBefore = s.toString();
+                handleBeforeTextChanged(s);
             }
 
             @Override
@@ -94,7 +88,12 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         textWatcher = null;
     }
 
-    private void handleOnTextChanged(CharSequence s, int start, int before, int count) {
+    public void handleBeforeTextChanged(CharSequence s) {
+        textChangeActive = true;
+        textBefore = s.toString();
+    }
+
+    public void handleOnTextChanged(CharSequence s, int start, int before, int count) {
         if (textChangeActive) {
             textAfter = s.toString();
             selectionStart = start;
@@ -103,52 +102,56 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         }
     }
 
-    private void handleAfterTextChanged() {
+    public void handleAfterTextChanged() {
         removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
 
         EditTextState newEditTextState = format(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
-        unformattedText = newEditTextState.getUnformattedText(); //New unformatted text
-        setText(newEditTextState.getFormattedText()); //Set new edit text string
+
+        if (unformattedText == null || !unformattedText.equals(newEditTextState.getUnformattedText())) {
+            unformattedText = newEditTextState.getUnformattedText(); //New unformatted text
+            if (onUnformattedValueListener != null) {
+                onUnformattedValueListener.onUnformattedValueChanged(unformattedText);
+            }
+        }
+
+        if (formattedText == null || !formattedText.equals(newEditTextState.getFormattedText())) {
+            formattedText = newEditTextState.getFormattedText();
+            if (onTextChangedListener != null) {
+                onTextChangedListener.onTextChanged(formattedText);
+            }
+        }
+
+        setNewText(formattedText);
 
         //Setting text programmatically resets the cursor, so this will reposition it
         setSelection(newEditTextState.getCursorStart(), newEditTextState.getCursorEnd());
-
-        if (changeListener != null) {
-            changeListener.onTextChanged(unformattedText,
-                    newEditTextState.getFormattedText(),
-                    newEditTextState.getCursorStart());
-        }
 
         addTextChangedListener(textWatcher);
         textChangeActive = false;
     }
 
     private void setNewText(CharSequence s) {
-        if (s == null) {
-            s = "";
-        }
 
-        if (getText() != null && !getText().equals(s)) {
+        if (s != null && getText() != null &&
+                !getText().toString().equals(s.toString())) {
             setText(s);
         }
     }
 
-    private void setUnformattedText(CharSequence s) {
-        if (s == null) {
-            s = "";
-        }
-
-        if (!s.toString().equals(unformattedText)) {
-            setText(s);
-        }
-    }
-
-    String getUnformattedText() {
+    public String getUnformattedText() {
         return unformattedText;
     }
 
-    public void setOnChangeListener(AutoFormatTextChangeListener changeListener) {
-        this.changeListener = changeListener;
+    public String getFormattedText() {
+        return formattedText;
+    }
+
+    public void setUnformattedValueChangedListener(UnformattedValueListener listener) {
+        onUnformattedValueListener = listener;
+    }
+
+    public void setTextChangedListener(TextChangedListener listener) {
+        onTextChangedListener = listener;
     }
 
     @BindingAdapter("android:text")
@@ -161,21 +164,16 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         editText.setNewText(newText);
     }
 
-    @BindingAdapter("unformattedText")
-    public static void setUnformattedText(AbstractAutoEditText editText, String unformattedText) {
-        editText.setUnformattedText(unformattedText);
+    public interface UnformattedValueListener {
+        void onUnformattedValueChanged(String value);
     }
 
-    @InverseBindingAdapter(attribute = "unformattedText", event = "android:textAttrChanged")
-    public static String getText(AbstractAutoEditText editText) {
-        return editText.getUnformattedText();
+
+    public interface TextChangedListener {
+        void onTextChanged(String text);
     }
 
-    public interface AutoFormatTextChangeListener {
-        void onTextChanged(String unformattedText, String formattedText, int position);
-    }
-
-    static class EditTextState {
+    public static class EditTextState {
         private String formattedText, unformattedText;
         private int cursorStart, cursorEnd;
 
