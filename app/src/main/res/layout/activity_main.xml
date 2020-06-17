@@ -30,8 +30,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:inputType="number"
-            android:text="@{observable.formattedText}"
-            app:unformattedText="@={observable.unformattedText}"
+            android:text="@={observable.formattedText}"
+            app:onTextChanged="@{observable::onTextChanged}"
+            app:onUnformattedValueChanged="@{observable::onUnformattedValueChanged}"
             app:format="@{observable.format}"
             app:placeholder="#" />
         <TextView

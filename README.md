@@ -7,27 +7,23 @@ A customizable solution for automatic text field formatting and masking in Andro
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="@{viewModel.formattedText}"
-    app:unformattedText="@={viewModel.unformattedText}"
+    app:onTextChanged="@{viewModel::onTextChanged}"
+    app:onUnformattedValueChanged="@{viewModel::onUnformattedValueChanged}"
     app:format="##/##/####"
     app:placeholder="#" />
 ```
 
 ## Description
 
-The following describes in more detail all custom attributes used by AutoFormatEditText:
+The following describes in more detail all custom attributes associated with AbstractAutoEditText (extends AppCompatEditText):
 * **text** - The formatted string content of the edit text
-* **unformattedText** - The unformatted string content of the edit text. It can also be thought of the actual characters that the user has entered. For example, a date entered with the format ##/##/#### and the text 07/19/1993 would have an unformatted value of 07191993. This is also called the "raw text".
+* **onTextChanged** - Binding for AbstractAutoEditText.TextChangedListener interface. Callback occurs when the text or "formatted text" changes.  
+* **onUnformattedValueChanged** - Binding for AbstractAutoEditText.UnformattedValueListener interface. Callback occurs when the unformatted or "raw" form of the text changes. For example, a date entered with the format ##/##/#### and the text 07/19/1993 would have an unformatted value of 07191993.
+
+The following describes in more detail all custom attributes associated with AutoFormatEditText (extends AbstractAutoEditText):
 * **format** - Used to derive the formatted string. Slots for a user's input characters are denoted by a placeholder. All other characters are literal and are inserted as the text changes. For example, a date format might be ##/##/####
-* **placeholder** - An optional attribute specifying the character used by the text format to represent the user's input characters (default is #)
+* **placeholder** - An optional attribute specifying the character used by the text format to represent the user's input characters (default is #). This attribute does not support data binding.
 
-| Attribute name  | Data binding support | Two-way data binding |
-| -------------   | -------------------- | -------------------- |
-| text            | yes                  | yes*                 |
-| unformattedText | yes                  | yes*                 |
-| format          | yes                  | no                   |
-| placeholder     | no                   | no                   |
-
-*Two-way data binding will only work for one attribute or the other, but not both
 
 <!-- License and Authors is optional here, but gives you the ability to highlight who is involed in the project -->
 ## License & Authors
