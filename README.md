@@ -14,6 +14,23 @@ A customizable solution for automatic text field formatting and masking in Andro
     app:format="##/##/####"
     app:placeholder="#" />
 ```
+## Installation
+Step 1: Add the JitPack repository to your project build.gradle file 
+```gradle
+allprojects {
+  repositories {
+    ...
+	maven { url 'https://jitpack.io' }
+  }
+}
+```
+
+Step 2: Add the desired version as a dependency in your app build.gradle file (see badge for the latest stable version)
+```gradle
+dependencies {
+  implementation 'com.github.IBM:auto-format-edit-text:1.0.2-beta'
+}
+```
 
 ## Usage
 
