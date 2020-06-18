@@ -1,7 +1,7 @@
 package com.ibm.autoformatedittext;
 
 @SuppressWarnings("WeakerAccess")
-class Formatter {
+public class Formatter {
     private char placeholder;
     private String format;
     private Integer unformattedLength;

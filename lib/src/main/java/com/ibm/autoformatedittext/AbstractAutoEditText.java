@@ -41,16 +41,6 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     void init(Context context, AttributeSet attrs) {
         setUpTextWatcher();
 
-        if (attrs != null) {
-            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AbstractAutoEditText);
-            CharSequence text = a.getText(R.styleable.AbstractAutoEditText_android_text);
-            a.recycle();
-
-            if (text != null && text.length() > 0) {
-                setText(text);
-            }
-        }
-
         //Prevents edge case where multiple callbacks are occurring for input type 'text'
         if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE) ||
                 getInputType() == InputType.TYPE_CLASS_TEXT || getInputType() == InputType.TYPE_TEXT_FLAG_MULTI_LINE) {
