@@ -6,6 +6,8 @@ import android.util.AttributeSet;
 
 import androidx.databinding.BindingAdapter;
 
+import com.carljmont.lib.R;
+
 public class AutoFormatEditText extends AbstractAutoEditText {
     private static final char DEFAULT_PLACEHOLDER = '#';
     private Formatter formatter;

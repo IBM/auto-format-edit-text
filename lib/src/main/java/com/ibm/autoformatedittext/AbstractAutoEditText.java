@@ -12,6 +12,8 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingMethod;
 import androidx.databinding.BindingMethods;
 
+import com.carljmont.lib.R;
+
 @BindingMethods({
         @BindingMethod(type = AbstractAutoEditText.class, attribute = "onTextChanged", method = "setTextChangedListener"),
         @BindingMethod(type = AbstractAutoEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")
