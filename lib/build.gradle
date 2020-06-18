@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+group = 'com.github.ibm'
 
 android {
     compileSdkVersion 29
@@ -12,6 +14,10 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    dataBinding {
+        enabled = true
     }
 
     buildTypes {

@@ -11,10 +11,10 @@ public class FormatObservable {
 
     public void onUnformattedValueChanged(String value) {
         unformattedText.set(value);
-        Log.i("XXX", value + ":");
+        Log.i("Unformatted", value + ":");
     }
 
     public void onTextChanged(String text) {
-        Log.i("YYY", text + ":");
+        Log.i("Formatted", text + ":");
     }
 }

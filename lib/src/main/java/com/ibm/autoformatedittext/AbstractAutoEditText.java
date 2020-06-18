@@ -12,6 +12,8 @@ import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingMethod;
 import androidx.databinding.BindingMethods;
 
+import com.carljmont.lib.R;
+
 @BindingMethods({
         @BindingMethod(type = AbstractAutoEditText.class, attribute = "onTextChanged", method = "setTextChangedListener"),
         @BindingMethod(type = AbstractAutoEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")
@@ -38,16 +40,6 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
 
     void init(Context context, AttributeSet attrs) {
         setUpTextWatcher();
-
-        if (attrs != null) {
-            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AbstractAutoEditText);
-            CharSequence text = a.getText(R.styleable.AbstractAutoEditText_android_text);
-            a.recycle();
-
-            if (text != null && text.length() > 0) {
-                setText(text);
-            }
-        }
 
         //Prevents edge case where multiple callbacks are occurring for input type 'text'
         if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE) ||
