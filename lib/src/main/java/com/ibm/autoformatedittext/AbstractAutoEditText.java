@@ -123,7 +123,6 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     }
 
     private void setNewText(CharSequence s) {
-
         if (s != null && getText() != null &&
                 !getText().toString().equals(s.toString())) {
             setText(s);
@@ -151,11 +150,6 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         editText.setNewText(newText);
     }
 
-    @BindingAdapter("text")
-    public static void setText(AbstractAutoEditText editText, String newText) {
-        editText.setNewText(newText);
-    }
-
     public interface UnformattedValueListener {
         void onUnformattedValueChanged(String value);
     }
@@ -165,6 +159,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         void onTextChanged(String text);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class EditTextState {
         private String formattedText, unformattedText;
         private int cursorStart, cursorEnd;
