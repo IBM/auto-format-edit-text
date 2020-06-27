@@ -7,7 +7,7 @@ import androidx.databinding.ObservableField;
 public class FormatObservable {
     public ObservableField<String> formattedText = new ObservableField<>();
     public ObservableField<String> unformattedText = new ObservableField<>();
-    public ObservableField<String> format = new ObservableField<>();
+    public ObservableField<String> inputMask = new ObservableField<>();
 
     public void onUnformattedValueChanged(String value) {
         unformattedText.set(value);

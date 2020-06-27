@@ -1,7 +1,6 @@
 package com.ibm.autoformatedittext;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -11,8 +10,6 @@ import androidx.appcompat.widget.AppCompatEditText;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.BindingMethod;
 import androidx.databinding.BindingMethods;
-
-import com.carljmont.lib.R;
 
 @BindingMethods({
         @BindingMethod(type = AbstractAutoEditText.class, attribute = "onTextChanged", method = "setTextChangedListener"),
@@ -48,7 +45,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         }
     }
 
-    abstract EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
+    abstract EditTextState onInputChanged(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
 
     private void setUpTextWatcher() {
         removeTextChangedListener(textWatcher);
@@ -97,7 +94,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     public void handleAfterTextChanged() {
         removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
 
-        EditTextState newEditTextState = format(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
+        EditTextState newEditTextState = onInputChanged(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
 
         if (unformattedText == null || !unformattedText.equals(newEditTextState.getUnformattedText())) {
             unformattedText = newEditTextState.getUnformattedText(); //New unformatted text
