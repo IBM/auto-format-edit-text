@@ -5,6 +5,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import androidx.appcompat.widget.AppCompatEditText;
 import androidx.databinding.BindingAdapter;
@@ -20,10 +21,10 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
     private TextChangedListener onTextChangedListener;
 
     private TextWatcher textWatcher;
-    private boolean textChangeActive;
 
-    private String textBefore, textAfter, formattedText, unformattedText;
-    private int selectionStart, selectionLength, replacementLength;
+    private boolean isStaticReplacementVisible;
+    private String textBefore;
+    private String formattedText, unformattedText;
 
     public AbstractAutoEditText(Context context) {
         super(context);
@@ -37,6 +38,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
 
     void init(Context context, AttributeSet attrs) {
         setUpTextWatcher();
+        formattedText = "";
 
         //Prevents edge case where multiple callbacks are occurring for input type 'text'
         if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE) ||
@@ -45,7 +47,18 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         }
     }
 
-    abstract EditTextState onInputChanged(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
+    abstract EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
+    abstract String getStaticReplacement(String unformattedText);
+
+    public void setStaticReplacementVisible(boolean visible) {
+        this.isStaticReplacementVisible = visible;
+
+        if (visible) {
+            setTextNoWatch(getStaticReplacement(unformattedText));
+        }else {
+            setNewText(unformattedText);
+        }
+    }
 
     private void setUpTextWatcher() {
         removeTextChangedListener(textWatcher);
@@ -53,7 +66,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         textWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                handleBeforeTextChanged(s);
+                textBefore = s.toString();
             }
 
             @Override
@@ -62,9 +75,7 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-                handleAfterTextChanged();
-            }
+            public void afterTextChanged(Editable s) {}
         };
 
         addTextChangedListener(textWatcher);
@@ -77,31 +88,16 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         textWatcher = null;
     }
 
-    public void handleBeforeTextChanged(CharSequence s) {
-        textChangeActive = true;
-        textBefore = s.toString();
-    }
-
-    public void handleOnTextChanged(CharSequence s, int start, int before, int count) {
-        if (textChangeActive) {
-            textAfter = s.toString();
-            selectionStart = start;
-            selectionLength = before;
-            replacementLength = count;
+    public void handleOnTextChanged(CharSequence s, int selectionStart, int selectionLength, int replacementLength) {
+        if (isStaticReplacementVisible) {
+            setTextNoWatch(textBefore);
+            setSelection(selectionStart + selectionLength);
+            return;
         }
-    }
 
-    public void handleAfterTextChanged() {
-        removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
+        //textBefore =  formattedText.trim().substring(0,formattedText.length());
 
-        EditTextState newEditTextState = onInputChanged(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
-
-        if (unformattedText == null || !unformattedText.equals(newEditTextState.getUnformattedText())) {
-            unformattedText = newEditTextState.getUnformattedText(); //New unformatted text
-            if (onUnformattedValueListener != null) {
-                onUnformattedValueListener.onUnformattedValueChanged(unformattedText);
-            }
-        }
+        EditTextState newEditTextState = format(textBefore, s.toString(), selectionStart, selectionLength, replacementLength);
 
         if (formattedText == null || !formattedText.equals(newEditTextState.getFormattedText())) {
             formattedText = newEditTextState.getFormattedText();
@@ -110,13 +106,24 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
             }
         }
 
-        setNewText(formattedText);
+        if (unformattedText == null || !unformattedText.equals(newEditTextState.getUnformattedText())) {
+            unformattedText = newEditTextState.getUnformattedText(); //New unformatted text
+            if (onUnformattedValueListener != null) {
+                onUnformattedValueListener.onUnformattedValueChanged(unformattedText);
+            }
+        }
+
+        setTextNoWatch(formattedText);
+
 
         //Setting text programmatically resets the cursor, so this will reposition it
         setSelection(newEditTextState.getCursorStart(), newEditTextState.getCursorEnd());
+    }
 
+    private void setTextNoWatch(String s) {
+        removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
+        setNewText(s);
         addTextChangedListener(textWatcher);
-        textChangeActive = false;
     }
 
     private void setNewText(CharSequence s) {
@@ -147,10 +154,14 @@ public abstract class AbstractAutoEditText extends AppCompatEditText {
         editText.setNewText(newText);
     }
 
+    @BindingAdapter("staticReplacementVisible")
+    public static void setStaticReplacementVisible(AutoFormatEditText editText, boolean visible) {
+        editText.setStaticReplacementVisible(visible);
+    }
+
     public interface UnformattedValueListener {
         void onUnformattedValueChanged(String value);
     }
-
 
     public interface TextChangedListener {
         void onTextChanged(String text);

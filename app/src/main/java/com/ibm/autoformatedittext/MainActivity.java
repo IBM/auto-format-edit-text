@@ -15,7 +15,6 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         final FormatObservable observable = new FormatObservable();
-        observable.inputMask.set("+1(###) ###-####");
         binding.setObservable(observable);
     }
 }

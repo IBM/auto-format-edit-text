@@ -11,6 +11,8 @@ import com.carljmont.lib.R;
 public class AutoFormatEditText extends AbstractAutoEditText {
     private static final char DEFAULT_PLACEHOLDER = '#';
     private InputMask inputMask;
+    private String staticFormat;
+    private boolean shiftMode = true;
 
     public AutoFormatEditText(Context context) {
         super(context);
@@ -27,33 +29,43 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         if (attrs != null) {
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText);
             String inputMaskString = a.getString(R.styleable.AutoFormatEditText_inputMask);
-            String formatPlaceholder = a.getString(R.styleable.AutoFormatEditText_placeholder);
+            String placeholderString = a.getString(R.styleable.AutoFormatEditText_imPlaceholder);
             a.recycle();
 
-            char placeholder = DEFAULT_PLACEHOLDER;
-            if (formatPlaceholder != null && formatPlaceholder.length() > 0) {
-                placeholder = formatPlaceholder.charAt(0);
+            char inputMaskPlaceholder = DEFAULT_PLACEHOLDER;
+            if (placeholderString != null && placeholderString.length() > 0) {
+                inputMaskPlaceholder = placeholderString.charAt(0);
             }
 
-            inputMask = new InputMask(inputMaskString, placeholder);
+            inputMask = new InputMask(inputMaskString, inputMaskPlaceholder);
         }
     }
 
     private void setInputMask(String inputMaskString) {
-        String unformattedText = getUnformattedText();
         inputMask.setInputMaskString(inputMaskString);
-
-        //If length of unformatted text is smaller than the input mask, it must be trimmed
-        if (unformattedText != null && unformattedText.length() > inputMaskString.length()) {
-            unformattedText = unformattedText.substring(0, inputMaskString.length());
-        }
-
-        setText(unformattedText); //Will cause re-formatting
+//        String unformattedText = getUnformattedText();
+//        inputMask.setInputMaskString(inputMaskString);
+//
+//        //If length of unformatted text is smaller than the input mask, it must be trimmed
+//        if (unformattedText != null && unformattedText.length() > inputMaskString.length()) {
+//            unformattedText = unformattedText.substring(0, inputMaskString.length());
+//        }
+//
+//        setText(unformattedText); //Will cause re-formatting
+        setText("");
     }
 
+    private void setStaticFormat(String staticFormat) {
+        this.staticFormat = staticFormat;
+    }
 
     @Override
-    EditTextState onInputChanged(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
+    String getStaticReplacement(String unformattedText) {
+        return StaticFormatter.format(unformattedText, staticFormat);
+    }
+
+    @Override
+    EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
         //Case where no input mask exists, so the text can be entered without restriction
         if (inputMask == null || inputMask.getInputMaskString() == null || inputMask.getInputMaskString().isEmpty()) {
             return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
@@ -71,18 +83,22 @@ public class AutoFormatEditText extends AbstractAutoEditText {
         String leftUnformatted = inputMask.unformatText(textBefore, 0, selectionStart);
         String rightUnformatted = inputMask.unformatText(textBefore, selectionStart + selectionLength, textBefore.length());
 
-        //Special case where user has backspaced in front of a character added by the input mask
-        //Remove next character to the left
-        if (leftUnformatted.length() > 0 &&
+        boolean userBackspaced = leftUnformatted.length() > 0 &&
                 leftUnformatted.length() <= inputMask.getUnformattedLength() &&
                 !inputMask.isPlaceholder(selectionStart) &&
-                selectionLength == 1 && replacementLength == 0) {
-            leftUnformatted = leftUnformatted.substring(0, leftUnformatted.length() - 1);
+                selectionLength == 1 && replacementLength == 0;
+
+        //Special case where user has backspaced in front of a character added by the input mask
+        //Remove next character to the left
+        if (userBackspaced && !shiftMode) {
+                leftUnformatted = leftUnformatted.substring(0, leftUnformatted.length() - 1);
         }
 
         String newUnformattedText = leftUnformatted + insertedText + rightUnformatted;
         String newFormattedText = inputMask.formatText(newUnformattedText);
-        int cursorPos = inputMask.formatText(leftUnformatted + insertedText).length();
+
+        int cursorPos = userBackspaced && shiftMode ? selectionStart :
+                inputMask.formatText(leftUnformatted + insertedText).length();
 
         return new EditTextState(newFormattedText, newUnformattedText, cursorPos);
     }
@@ -90,5 +106,10 @@ public class AutoFormatEditText extends AbstractAutoEditText {
     @BindingAdapter("inputMask")
     public static void setInputMask(AutoFormatEditText editText, String inputMaskString) {
         editText.setInputMask(inputMaskString);
+    }
+
+    @BindingAdapter("staticFormat")
+    public static void setStaticFormat(AutoFormatEditText editText, String staticFormat) {
+        editText.setStaticFormat(staticFormat);
     }
 }
