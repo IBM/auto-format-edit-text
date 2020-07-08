@@ -3,13 +3,13 @@ package com.ibm.autoformatedittext.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StaticFormatter {
+public class HideFormatter {
     private final static String RANGE_INDICATOR = "-";
     private final static String REGEX = "\\[[0-9]+(%s[0-9]+)?]";
     private final static String PATTERN_STR = String.format(REGEX, RANGE_INDICATOR);
 
-    public static String format(String s, String staticFormat) {
-        if (s == null || staticFormat == null) {
+    public static String format(String s, String hideModeFormat) {
+        if (s == null || hideModeFormat == null) {
             return s;
         }
 
@@ -17,15 +17,15 @@ public class StaticFormatter {
         Matcher m;
 
         do {
-            m = pattern.matcher(staticFormat);
+            m = pattern.matcher(hideModeFormat);
             if (m.find()) {
                 String matchingSection = m.group();
                 String replacement = getReplacement(s, matchingSection);
-                staticFormat = staticFormat.replaceFirst(PATTERN_STR, replacement);
+                hideModeFormat = hideModeFormat.replaceFirst(PATTERN_STR, replacement);
             }
         }while(m.find());
 
-        return staticFormat;
+        return hideModeFormat;
     }
 
     private static String getReplacement(String s, String matchingSection) {
@@ -46,7 +46,7 @@ public class StaticFormatter {
         int startIndex = Integer.parseInt(startStr);
         int endIndex = Integer.parseInt(endStr);
 
-        if (startIndex < 0 || endIndex > s.length() || startIndex > endIndex) {
+        if (startIndex < 0 || endIndex >= s.length() || startIndex > endIndex) {
             return "";
         }
 

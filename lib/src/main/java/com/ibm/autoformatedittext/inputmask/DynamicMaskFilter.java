@@ -1,9 +1,9 @@
 package com.ibm.autoformatedittext.inputmask;
 
-import com.ibm.autoformatedittext.FormattedEditText;
+import com.ibm.autoformatedittext.FormattedInputEditText;
 import com.ibm.autoformatedittext.model.EditTextState;
 
-public class DynamicMaskFilter implements FormattedEditText.MaskingInputFilter {
+public class DynamicMaskFilter implements FormattedInputEditText.MaskingInputFilter {
     private InputMask inputMask;
     private boolean shiftModeEnabled;
 
@@ -44,15 +44,15 @@ public class DynamicMaskFilter implements FormattedEditText.MaskingInputFilter {
         String leftUnformatted = inputMask.unformatText(textBefore, 0, selectionStart);
         String rightUnformatted = inputMask.unformatText(textBefore, selectionStart + selectionLength, textBefore.length());
 
-        boolean userBackspaced = leftUnformatted.length() > 0 &&
-                leftUnformatted.length() <= inputMask.getUnformattedLength() &&
+        //Gives a fairly good idea of whether the user removed a single character without watching for keypresses
+        boolean userBackspaced = leftUnformatted.length() <= inputMask.getUnformattedLength() &&
                 !inputMask.isPlaceholder(selectionStart) &&
                 selectionLength == 1 &&
                 replacementLength == 0;
 
         //Special case where user has backspaced in front of a character added by the input mask
         //If in shift mode, remove next character to the left
-        if (userBackspaced && shiftModeEnabled) {
+        if (leftUnformatted.length() > 0 && userBackspaced && shiftModeEnabled) {
             leftUnformatted = leftUnformatted.substring(0, leftUnformatted.length() - 1);
         }
 

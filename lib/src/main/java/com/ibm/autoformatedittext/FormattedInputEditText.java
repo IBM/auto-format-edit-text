@@ -14,26 +14,26 @@ import androidx.databinding.BindingMethods;
 import com.ibm.autoformatedittext.model.EditTextState;
 
 @BindingMethods({
-        @BindingMethod(type = FormattedEditText.class, attribute = "onFormattedValueChanged", method = "setFormattedValueChangedListener"),
-        @BindingMethod(type = FormattedEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")
+        @BindingMethod(type = FormattedInputEditText.class, attribute = "onFormattedValueChanged", method = "setFormattedValueChangedListener"),
+        @BindingMethod(type = FormattedInputEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")
 })
-public class FormattedEditText extends AppCompatEditText {
+public class FormattedInputEditText extends AppCompatEditText {
     private UnformattedValueListener onUnformattedValueListener;
     private FormattedValueListener onFormattedValueListener;
     private MaskingInputFilter maskingInputFilter;
 
     private TextWatcher textWatcher;
 
-    public boolean staticModeEnabled;
+    public boolean hideModeEnabled;
     private String textBefore;
     private String formattedText, unformattedText;
 
-    public FormattedEditText(Context context) {
+    public FormattedInputEditText(Context context) {
         super(context);
         init(context, null);
     }
 
-    public FormattedEditText(Context context, AttributeSet attrs) {
+    public FormattedInputEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
@@ -48,24 +48,23 @@ public class FormattedEditText extends AppCompatEditText {
         }
     }
 
-    //public EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
-    public String getStaticReplacement(String unformattedText) {
+    public String getHideModeReplacementText(String unformattedText) {
         return unformattedText;
     }
 
-    public void setStaticModeEnabled(boolean enabled) {
-        this.staticModeEnabled = enabled;
+    public void setHideModeEnabled(boolean enabled) {
+        this.hideModeEnabled = enabled;
 
         if (enabled) {
-            setTextNoWatch(getStaticReplacement(unformattedText));
+            setTextNoWatch(getHideModeReplacementText(unformattedText));
         }else {
             setNewText(unformattedText);
         }
     }
 
-    public void refreshStaticReplacement() {
-        if (staticModeEnabled) {
-            setTextNoWatch(getStaticReplacement(unformattedText));
+    public void refreshHideModeReplacementText() {
+        if (hideModeEnabled) {
+            setTextNoWatch(getHideModeReplacementText(unformattedText));
         }
     }
 
@@ -98,7 +97,7 @@ public class FormattedEditText extends AppCompatEditText {
     }
 
     public void handleOnTextChanged(CharSequence s, int selectionStart, int selectionLength, int replacementLength) {
-        if (staticModeEnabled) {
+        if (hideModeEnabled) {
             setTextNoWatch(textBefore);
             setSelection(selectionStart + selectionLength);
             return;
@@ -162,13 +161,13 @@ public class FormattedEditText extends AppCompatEditText {
     }
 
     @BindingAdapter("android:text")
-    public static void setTextAndroid(FormattedEditText editText, String newText) {
+    public static void setTextAndroid(FormattedInputEditText editText, String newText) {
         editText.setNewText(newText);
     }
 
-    @BindingAdapter("staticModeEnabled")
-    public static void setStaticModeEnabled(AutoFormatEditText editText, boolean enabled) {
-        editText.setStaticModeEnabled(enabled);
+    @BindingAdapter("hideModeEnabled")
+    public static void setHideModeEnabled(AutoFormatInputEditText editText, boolean enabled) {
+        editText.setHideModeEnabled(enabled);
     }
 
     public interface UnformattedValueListener {

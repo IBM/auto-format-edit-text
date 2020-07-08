@@ -12,6 +12,25 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="Input value"/>
+        <com.ibm.autoformatedittext.AutoFormatInputEditText
+            android:id="@+id/phoneNumberAutoFormatEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:typeface="monospace"
+            android:hint="@{observable.inputMask}"
+            android:text="@={observable.formattedText}"
+            android:enabled="@{observable.inputEnabled}"
+            app:onFormattedValueChanged="@{observable::onFormattedValueChanged}"
+            app:onUnformattedValueChanged="@{observable::onUnformattedValueChanged}"
+            app:inputMask="@{observable.inputMask}"
+            app:hideModeFormat="@{observable.hideModeFormat}"
+            app:shiftModeEnabled="@{observable.shiftModeEnabled}"
+            app:hideModeEnabled="@{observable.hideModeEnabled}"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:text="Input Mask"/>
         <androidx.appcompat.widget.AppCompatEditText
             android:layout_width="match_parent"
@@ -22,46 +41,26 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Static text format"/>
+            android:text="Hide mode format"/>
         <androidx.appcompat.widget.AppCompatEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:typeface="monospace"
-            android:text="@={observable.staticFormat}" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Formatted value"/>
-        <com.ibm.autoformatedittext.AutoFormatEditText
-            android:id="@+id/phoneNumberAutoFormatEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:inputType="number"
-            android:typeface="monospace"
-            android:hint="@{observable.inputMask}"
-            android:text="@={observable.formattedText}"
-            android:enabled="@{observable.enabled}"
-            app:onFormattedValueChanged="@{observable::onFormattedValueChanged}"
-            app:onUnformattedValueChanged="@{observable::onUnformattedValueChanged}"
-            app:inputMask="@{observable.inputMask}"
-            app:inputMaskPlaceholder="#"
-            app:staticFormat="@{observable.staticFormat}"
-            app:shiftModeEnabled="@{observable.shiftModeEnabled}"
-            app:staticModeEnabled="@{observable.staticModeEnabled}"/>
+            android:text="@={observable.hideModeFormat}" />
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/static_text_enabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Edit text enabled"
-            android:onClick="@{observable::onToggleEnableClick}"/>
+            android:text="Input enabled"
+            android:checked="true"
+            android:onClick="@{observable::onToggleInputEnabledClick}"/>
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/static_text_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Static text mode enabled"
-            android:onClick="@{observable::onStaticModeToggleClick}"/>
+            android:text="Hide mode enabled"
+            android:onClick="@{observable::onHideModeToggleClick}"/>
         <androidx.appcompat.widget.AppCompatCheckBox
             android:id="@+id/shift_mode_checkbox"
             android:layout_width="wrap_content"
@@ -69,7 +68,6 @@
             android:text="Shift mode enabled"
             android:layout_marginBottom="12dp"
             android:onClick="@{observable::onShiftModeToggleClick}"/>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,7 +75,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{`Static text format: ` + observable.staticFormat}"/>
+            android:text="@{`Hide mode format: ` + observable.hideModeFormat}"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,8 +85,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:text="@{`Unformatted Text: ` + observable.unformattedText}"/>
-
-
     </LinearLayout>
 </layout>
 

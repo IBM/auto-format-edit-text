@@ -1,5 +1,6 @@
 package com.ibm.autoformatedittext;
 
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 
@@ -11,10 +12,10 @@ public class FormatObservable {
     public ObservableField<String> formattedText = new ObservableField<>("");
     public ObservableField<String> unformattedText = new ObservableField<>("0000000000");
     public ObservableField<String> inputMask = new ObservableField<>("(###) ###-####");
-    public ObservableField<String> staticFormat = new ObservableField<>("([0]**) ***-[6-9]");
-    public ObservableField<Boolean> enabled = new ObservableField<>(true);
+    public ObservableField<String> hideModeFormat = new ObservableField<>("([0]**) ***-[6-9]");
+    public ObservableField<Boolean> inputEnabled = new ObservableField<>(true);
     public ObservableField<Boolean> shiftModeEnabled = new ObservableField<>(false);
-    public ObservableField<Boolean> staticModeEnabled = new ObservableField<>(false);
+    public ObservableField<Boolean> hideModeEnabled = new ObservableField<>(false);
 
     public void onUnformattedValueChanged(String value) {
         unformattedText.set(value);
@@ -25,15 +26,15 @@ public class FormatObservable {
         Log.i("Formatted", text + "...");
     }
 
-    public void onToggleEnableClick(View v) {
-        enabled.set(!Objects.requireNonNull(enabled.get()));
+    public void onToggleInputEnabledClick(View v) {
+        inputEnabled.set(!Objects.requireNonNull(inputEnabled.get()));
     }
 
     public void onShiftModeToggleClick(View v) {
         shiftModeEnabled.set(!Objects.requireNonNull(shiftModeEnabled.get()));
     }
 
-    public void onStaticModeToggleClick(View v) {
-        staticModeEnabled.set(!Objects.requireNonNull(staticModeEnabled.get()));
+    public void onHideModeToggleClick(View v) {
+        hideModeEnabled.set(!Objects.requireNonNull(hideModeEnabled.get()));
     }
 }
