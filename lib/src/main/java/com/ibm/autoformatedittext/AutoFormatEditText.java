@@ -10,15 +10,15 @@ import com.carljmont.lib.R;
 import com.ibm.autoformatedittext.inputmask.DynamicMaskFilter;
 import com.ibm.autoformatedittext.util.HideFormatter;
 
-public class AutoFormatInputEditText extends FormattedInputEditText {
+public class AutoFormatEditText extends FormattedInputEditText {
     private String hideModeFormat;
     private DynamicMaskFilter dynamicMaskFilter;
 
-    public AutoFormatInputEditText(Context context) {
+    public AutoFormatEditText(Context context) {
         super(context);
     }
 
-    public AutoFormatInputEditText(Context context, AttributeSet attrs) {
+    public AutoFormatEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
@@ -27,10 +27,10 @@ public class AutoFormatInputEditText extends FormattedInputEditText {
         super.init(context, attrs);
 
         if (attrs != null) {
-            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatInputEditText);
-            String inputMaskString = a.getString(R.styleable.AutoFormatInputEditText_inputMask);
-            String placeholderString = a.getString(R.styleable.AutoFormatInputEditText_inputMaskPlaceholder);
-            boolean shiftModeEnabled = a.getBoolean(R.styleable.AutoFormatInputEditText_shiftModeEnabled, false);
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText);
+            String inputMaskString = a.getString(R.styleable.AutoFormatEditText_inputMask);
+            String placeholderString = a.getString(R.styleable.AutoFormatEditText_inputMaskPlaceholder);
+            boolean shiftModeEnabled = a.getBoolean(R.styleable.AutoFormatEditText_shiftModeEnabled, false);
             a.recycle();
 
             dynamicMaskFilter = new DynamicMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
@@ -63,22 +63,22 @@ public class AutoFormatInputEditText extends FormattedInputEditText {
     }
 
     @BindingAdapter("inputMask")
-    public static void setInputMask(AutoFormatInputEditText editText, String mask) {
+    public static void setInputMask(AutoFormatEditText editText, String mask) {
         editText.setInputMask(mask);
     }
 
     @BindingAdapter("inputMaskPlaceholder")
-    public static void setInputMaskPlaceholder(AutoFormatInputEditText editText, String placeholder) {
+    public static void setInputMaskPlaceholder(AutoFormatEditText editText, String placeholder) {
         editText.setInputMaskPlaceholder(placeholder);
     }
 
     @BindingAdapter("shiftModeEnabled")
-    public static void setShiftModeEnabled(AutoFormatInputEditText editText, boolean enabled) {
+    public static void setShiftModeEnabled(AutoFormatEditText editText, boolean enabled) {
         editText.setShiftModeEnabled(enabled);
     }
 
     @BindingAdapter("hideModeFormat")
-    public static void setHideModeFormat(AutoFormatInputEditText editText, String format) {
+    public static void setHideModeFormat(AutoFormatEditText editText, String format) {
         editText.setHideModeFormat(format);
     }
 }

@@ -166,7 +166,7 @@ public class FormattedInputEditText extends AppCompatEditText {
     }
 
     @BindingAdapter("hideModeEnabled")
-    public static void setHideModeEnabled(AutoFormatInputEditText editText, boolean enabled) {
+    public static void setHideModeEnabled(AutoFormatEditText editText, boolean enabled) {
         editText.setHideModeEnabled(enabled);
     }
 
