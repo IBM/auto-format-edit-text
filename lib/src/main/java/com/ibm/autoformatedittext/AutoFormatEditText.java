@@ -7,12 +7,12 @@ import android.util.AttributeSet;
 import androidx.databinding.BindingAdapter;
 
 import com.carljmont.lib.R;
-import com.ibm.autoformatedittext.inputmask.MaskingInputMaskFilter;
+import com.ibm.autoformatedittext.inputmask.DynamicMaskFilter;
 import com.ibm.autoformatedittext.util.StaticFormatter;
 
 public class AutoFormatEditText extends FormattedEditText {
     private String staticFormat;
-    private MaskingInputMaskFilter inputMaskFilter;
+    private DynamicMaskFilter dynamicMaskFilter;
 
     public AutoFormatEditText(Context context) {
         super(context);
@@ -33,22 +33,22 @@ public class AutoFormatEditText extends FormattedEditText {
             boolean shiftModeEnabled = a.getBoolean(R.styleable.AutoFormatEditText_shiftModeEnabled, false);
             a.recycle();
 
-            inputMaskFilter = new MaskingInputMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
-            setMaskingInputFilter(inputMaskFilter);
+            dynamicMaskFilter = new DynamicMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
+            setMaskingInputFilter(dynamicMaskFilter);
         }
     }
 
     private void setInputMask(String inputMaskString) {
-        inputMaskFilter.setMaskString(inputMaskString);
+        dynamicMaskFilter.setMaskString(inputMaskString);
         setText("");
     }
 
     private void setInputMaskPlaceholder(String placeholderString) {
-        inputMaskFilter.setPlaceholder(placeholderString);
+        dynamicMaskFilter.setPlaceholder(placeholderString);
     }
 
     private void setShiftModeEnabled(boolean enabled) {
-        inputMaskFilter.setShiftModeEnabled(enabled);
+        dynamicMaskFilter.setShiftModeEnabled(enabled);
     }
 
     private void setStaticFormat(String staticFormat) {

@@ -18,8 +18,8 @@ public class MainActivity extends AppCompatActivity {
         final FormatObservable observable = new FormatObservable();
         binding.setObservable(observable);
 
-//        binding.phoneNumberAutoFormatEditText.setFormattedInputFilter(
-//                new FormattedEditText.FormattedInputFilter() {
+//        binding.phoneNumberAutoFormatEditText.setMaskingInputFilter(
+//                new FormattedEditText.MaskingInputFilter() {
 //                    @Override
 //                    public EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
 //                        String newText = textAfter.length() > textBefore.length() ? textAfter + "-" : textAfter;
