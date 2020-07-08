@@ -1,4 +1,4 @@
-package com.ibm.autoformatedittext;
+package com.ibm.autoformatedittext.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

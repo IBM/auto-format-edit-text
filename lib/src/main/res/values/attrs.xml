@@ -2,7 +2,8 @@
 <resources>
     <declare-styleable name="AutoFormatEditText">
         <attr name="inputMask" format="string" />
+        <attr name="inputMaskPlaceholder" format="string" />
         <attr name="staticFormat" format="string" />
-        <attr name="imPlaceholder" format="string" />
+        <attr name="shiftModeEnabled" format="boolean" />
     </declare-styleable>
 </resources>

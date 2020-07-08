@@ -16,10 +16,18 @@
         <androidx.appcompat.widget.AppCompatEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
             android:typeface="monospace"
             android:text="@={observable.inputMask}"
             android:hint="####" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Static text format"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:typeface="monospace"
+            android:text="@={observable.staticFormat}" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,28 +40,55 @@
             android:layout_marginBottom="12dp"
             android:inputType="number"
             android:typeface="monospace"
+            android:hint="@{observable.inputMask}"
             android:text="@={observable.formattedText}"
-            app:onTextChanged="@{observable::onTextChanged}"
+            android:enabled="@{observable.enabled}"
+            app:onFormattedValueChanged="@{observable::onFormattedValueChanged}"
             app:onUnformattedValueChanged="@{observable::onUnformattedValueChanged}"
             app:inputMask="@{observable.inputMask}"
+            app:inputMaskPlaceholder="#"
             app:staticFormat="@{observable.staticFormat}"
-            app:staticReplacementVisible="@{!observable.enabled}"
-            app:placeholder="#" />
-        <TextView
+            app:shiftModeEnabled="@{observable.shiftModeEnabled}"
+            app:staticModeEnabled="@{observable.staticModeEnabled}"/>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/static_text_enabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Unformatted Text"/>
-        <androidx.appcompat.widget.AppCompatEditText
+            android:text="Edit text enabled"
+            android:onClick="@{observable::onToggleEnableClick}"/>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/static_text_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Static text mode enabled"
+            android:onClick="@{observable::onStaticModeToggleClick}"/>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/shift_mode_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shift mode enabled"
+            android:layout_marginBottom="12dp"
+            android:onClick="@{observable::onShiftModeToggleClick}"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{`Input Mask: ` + observable.inputMask}"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{`Static text format: ` + observable.staticFormat}"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{`Formatted Text: ` + observable.formattedText}"/>
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:typeface="monospace"
-            android:text="@={observable.unformattedText}"/>
-        <androidx.appcompat.widget.AppCompatButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{observable.onToggleEnableClick}"
-            android:text="Toggle Enable"/>
+            android:text="@{`Unformatted Text: ` + observable.unformattedText}"/>
+
+
     </LinearLayout>
 </layout>
 

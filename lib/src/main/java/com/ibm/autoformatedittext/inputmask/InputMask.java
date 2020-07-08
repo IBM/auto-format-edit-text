@@ -1,14 +1,16 @@
-package com.ibm.autoformatedittext;
+package com.ibm.autoformatedittext.inputmask;
 
 @SuppressWarnings("WeakerAccess")
 public class InputMask {
+    private static final char DEFAULT_PLACEHOLDER = '#';
+
     private char placeholder;
     private String inputMaskString;
     private Integer unformattedLength;
 
-    public InputMask(String inputMaskString, char placeholder) {
+    public InputMask(String inputMaskString, String placeholder) {
         this.inputMaskString = inputMaskString;
-        this.placeholder = placeholder;
+        setPlaceholder(placeholder);
     }
 
     //Returns true if the character in the format at the specified index is the placeholder character
@@ -91,5 +93,14 @@ public class InputMask {
     public void setInputMaskString(String inputMaskString) {
         this.inputMaskString = inputMaskString;
         this.unformattedLength = null;
+    }
+
+    public char getPlaceholder() {
+        return placeholder;
+    }
+
+    public void setPlaceholder(String placeholderString) {
+        boolean placeholderValid = placeholderString != null && placeholderString.length() == 1;
+        this.placeholder = placeholderValid ? placeholderString.charAt(0) : DEFAULT_PLACEHOLDER;
     }
 }

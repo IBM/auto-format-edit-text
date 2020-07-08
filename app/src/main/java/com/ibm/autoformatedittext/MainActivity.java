@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
 
 import com.ibm.autoformatedittext.databinding.ActivityMainBinding;
+import com.ibm.autoformatedittext.model.EditTextState;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,5 +17,14 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         final FormatObservable observable = new FormatObservable();
         binding.setObservable(observable);
+
+//        binding.phoneNumberAutoFormatEditText.setFormattedInputFilter(
+//                new FormattedEditText.FormattedInputFilter() {
+//                    @Override
+//                    public EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
+//                        String newText = textAfter.length() > textBefore.length() ? textAfter + "-" : textAfter;
+//                        return new EditTextState(newText, newText, newText.length());
+//                    }
+//                });
     }
 }
