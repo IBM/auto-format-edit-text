@@ -1,4 +1,6 @@
 # Android Auto Format EditText
+[![](https://jitpack.io/v/IBM/auto-format-edit-text.svg)](https://jitpack.io/#IBM/auto-format-edit-text)
+
 A customizable solution for automatic text field formatting and masking in Android applications. The AutoFormatEditText component extends from AppCompatEditText and handles the automatic real-time formatting of content such as dates, credit card numbers, and phone numbers. An abstract class AbstractAutoEditText can be extended more fine grained control over the behavior.
 
 ## Example
@@ -7,27 +9,39 @@ A customizable solution for automatic text field formatting and masking in Andro
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="@{viewModel.formattedText}"
-    app:unformattedText="@={viewModel.unformattedText}"
+    app:onTextChanged="@{viewModel::onTextChanged}"
+    app:onUnformattedValueChanged="@{viewModel::onUnformattedValueChanged}"
     app:format="##/##/####"
     app:placeholder="#" />
 ```
+## Installation
+Step 1: Add the JitPack repository to your project build.gradle file 
+```gradle
+allprojects {
+  repositories {
+    ...
+	maven { url 'https://jitpack.io' }
+  }
+}
+```
 
-## Description
+Step 2: Add the desired version as a dependency in your app build.gradle file (see badge for the latest stable version)
+```gradle
+dependencies {
+  implementation 'com.github.IBM:auto-format-edit-text:1.0.2-beta'
+}
+```
 
-The following describes in more detail all custom attributes used by AutoFormatEditText:
-* **text** - The formatted string content of the edit text
-* **unformattedText** - The unformatted string content of the edit text. It can also be thought of the actual characters that the user has entered. For example, a date entered with the format ##/##/#### and the text 07/19/1993 would have an unformatted value of 07191993. This is also called the "raw text".
-* **format** - Used to derive the formatted string. Slots for a user's input characters are denoted by a placeholder. All other characters are literal and are inserted as the text changes. For example, a date format might be ##/##/####
-* **placeholder** - An optional attribute specifying the character used by the text format to represent the user's input characters (default is #)
+## Usage
 
-| Attribute name  | Data binding support | Two-way data binding |
-| -------------   | -------------------- | -------------------- |
-| text            | yes                  | yes*                 |
-| unformattedText | yes                  | yes*                 |
-| format          | yes                  | no                   |
-| placeholder     | no                   | no                   |
+The following describes in more detail all custom attributes associated with AbstractAutoEditText (extends AppCompatEditText):
+* **onTextChanged** - Binding for AbstractAutoEditText.TextChangedListener interface. Callback occurs when the "formatted text" changes.  
+* **onUnformattedValueChanged** - Binding for AbstractAutoEditText.UnformattedValueListener interface. Callback occurs when the unformatted or "raw" form of the text changes. For example, a date entered with the format ##/##/#### and the text 07/19/1993 would have an unformatted value of 07191993.
 
-*Two-way data binding will only work for one attribute or the other, but not both
+The following describes in more detail all custom attributes associated with AutoFormatEditText (extends AbstractAutoEditText):
+* **format** - A template for the formatted text. Slots for a user's input characters are denoted by a placeholder. All other characters are literal and are inserted as the text changes. For example, a date format might be ##/##/####
+* **placeholder** - An optional attribute specifying the character used by the text format to represent the user's input characters (default is #). This attribute does not support data binding.
+
 
 <!-- License and Authors is optional here, but gives you the ability to highlight who is involed in the project -->
 ## License & Authors
