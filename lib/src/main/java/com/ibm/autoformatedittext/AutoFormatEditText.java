@@ -63,8 +63,8 @@ public class AutoFormatEditText extends FormattedInputEditText {
     }
 
     @BindingAdapter("inputMask")
-    public static void setInputMask(AutoFormatEditText editText, String mask) {
-        editText.setInputMask(mask);
+    public static void setInputMask(AutoFormatEditText editText, String maskString) {
+        editText.setInputMask(maskString);
     }
 
     @BindingAdapter("inputMaskPlaceholder")

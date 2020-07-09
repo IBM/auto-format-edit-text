@@ -4,11 +4,12 @@ import com.ibm.autoformatedittext.FormattedInputEditText;
 import com.ibm.autoformatedittext.model.EditTextState;
 
 public class DynamicMaskFilter implements FormattedInputEditText.MaskingInputFilter {
+    private static final char DEFAULT_PLACEHOLDER = '#';
     private InputMask inputMask;
     private boolean shiftModeEnabled;
 
-    public DynamicMaskFilter(String maskString, String placeholder, boolean shiftModeEnabled) {
-        this.inputMask = new InputMask(maskString, placeholder);
+    public DynamicMaskFilter(String maskString, String placeholderString, boolean shiftModeEnabled) {
+        this.inputMask = new InputMask(maskString, getPlaceholder(placeholderString));
         this.shiftModeEnabled = shiftModeEnabled;
     }
 
@@ -16,12 +17,17 @@ public class DynamicMaskFilter implements FormattedInputEditText.MaskingInputFil
         inputMask.setInputMaskString(maskString);
     }
 
-    public void setPlaceholder(String placeholder) {
-        inputMask.setPlaceholder(placeholder);
+    public void setPlaceholder(String placeholderString) {
+        inputMask.setPlaceholder(getPlaceholder(placeholderString));
     }
 
     public void setShiftModeEnabled(boolean shiftModeEnabled) {
         this.shiftModeEnabled = shiftModeEnabled;
+    }
+
+    private char getPlaceholder(String placeholderString) {
+        boolean placeholderValid = placeholderString != null && placeholderString.length() == 1;
+        return placeholderValid ? placeholderString.charAt(0) : DEFAULT_PLACEHOLDER;
     }
 
     @Override
