@@ -7,10 +7,12 @@ import android.util.AttributeSet;
 import androidx.databinding.BindingAdapter;
 
 import com.carljmont.lib.R;
+import com.ibm.autoformatedittext.inputmask.DynamicMaskFilter;
+import com.ibm.autoformatedittext.util.HideFormatter;
 
-public class AutoFormatEditText extends AbstractAutoEditText {
-    private static final char DEFAULT_PLACEHOLDER = '#';
-    private Formatter formatter;
+public class AutoFormatEditText extends FormattedInputEditText {
+    private String hideModeFormat;
+    private DynamicMaskFilter dynamicMaskFilter;
 
     public AutoFormatEditText(Context context) {
         super(context);
@@ -26,69 +28,57 @@ public class AutoFormatEditText extends AbstractAutoEditText {
 
         if (attrs != null) {
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AutoFormatEditText);
-            String format = a.getString(R.styleable.AutoFormatEditText_format);
-            String formatPlaceholder = a.getString(R.styleable.AutoFormatEditText_placeholder);
+            String inputMaskString = a.getString(R.styleable.AutoFormatEditText_inputMask);
+            String placeholderString = a.getString(R.styleable.AutoFormatEditText_inputMaskPlaceholder);
+            boolean shiftModeEnabled = a.getBoolean(R.styleable.AutoFormatEditText_shiftModeEnabled, false);
             a.recycle();
 
-            char placeholder = DEFAULT_PLACEHOLDER;
-            if (formatPlaceholder != null && formatPlaceholder.length() > 0) {
-                placeholder = formatPlaceholder.charAt(0);
-            }
-
-            formatter = new Formatter(format, placeholder);
+            dynamicMaskFilter = new DynamicMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
+            setMaskingInputFilter(dynamicMaskFilter);
         }
     }
 
-    private void setFormat(String format) {
-        String unformattedText = getUnformattedText();
-        formatter.setFormat(format);
-
-        //If length of unformatted text is smaller than the format, it must be trimmed
-        if (unformattedText != null && unformattedText.length() > format.length()) {
-            unformattedText = unformattedText.substring(0, format.length());
-        }
-
-        setText(unformattedText); //Will cause re-formatting
+    private void setInputMask(String inputMaskString) {
+        dynamicMaskFilter.setMaskString(inputMaskString);
+        setText("");
     }
 
+    private void setInputMaskPlaceholder(String placeholderString) {
+        dynamicMaskFilter.setPlaceholder(placeholderString);
+        setText("");
+    }
+
+    private void setShiftModeEnabled(boolean enabled) {
+        dynamicMaskFilter.setShiftModeEnabled(enabled);
+    }
+
+    private void setHideModeFormat(String staticFormat) {
+        this.hideModeFormat = staticFormat;
+        refreshHideModeReplacementText();
+    }
 
     @Override
-    EditTextState format(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
-        //Case where no format exists, so the text can be entered without restriction
-        if (formatter == null || formatter.getFormat() == null || formatter.getFormat().isEmpty()) {
-            return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
-        }
-
-        //Case where user is attempting to enter text beyond the length of the format
-        if (textAfter.length() > formatter.getFormat().length()
-            && selectionLength != replacementLength && selectionStart > 0
-            && !formatter.matches(textAfter)) {
-                String newUnformattedText = formatter.unformatText(textBefore, 0, textBefore.length());
-                return new EditTextState(textBefore, newUnformattedText, selectionStart);
-        }
-
-        CharSequence insertedText = textAfter.subSequence(selectionStart, selectionStart + replacementLength);
-        String leftUnformatted = formatter.unformatText(textBefore, 0, selectionStart);
-        String rightUnformatted = formatter.unformatText(textBefore, selectionStart + selectionLength, textBefore.length());
-
-        //Special case where user has backspaced in front of a character added by the format
-        //Remove next character to the left
-        if (leftUnformatted.length() > 0 &&
-                leftUnformatted.length() <= formatter.getUnformattedLength() &&
-                !formatter.isPlaceholder(selectionStart) &&
-                selectionLength == 1 && replacementLength == 0) {
-            leftUnformatted = leftUnformatted.substring(0, leftUnformatted.length() - 1);
-        }
-
-        String newUnformattedText = leftUnformatted + insertedText + rightUnformatted;
-        String newFormattedText = formatter.formatText(newUnformattedText);
-        int cursorPos = formatter.formatText(leftUnformatted + insertedText).length();
-
-        return new EditTextState(newFormattedText, newUnformattedText, cursorPos);
+    public String getHideModeReplacementText(String unformattedText) {
+        return HideFormatter.format(unformattedText, hideModeFormat);
     }
 
-    @BindingAdapter("format")
-    public static void setFormat(AutoFormatEditText editText, String format) {
-        editText.setFormat(format);
+    @BindingAdapter("inputMask")
+    public static void setInputMask(AutoFormatEditText editText, String maskString) {
+        editText.setInputMask(maskString);
+    }
+
+    @BindingAdapter("inputMaskPlaceholder")
+    public static void setInputMaskPlaceholder(AutoFormatEditText editText, String placeholder) {
+        editText.setInputMaskPlaceholder(placeholder);
+    }
+
+    @BindingAdapter("shiftModeEnabled")
+    public static void setShiftModeEnabled(AutoFormatEditText editText, boolean enabled) {
+        editText.setShiftModeEnabled(enabled);
+    }
+
+    @BindingAdapter("hideModeFormat")
+    public static void setHideModeFormat(AutoFormatEditText editText, String format) {
+        editText.setHideModeFormat(format);
     }
 }

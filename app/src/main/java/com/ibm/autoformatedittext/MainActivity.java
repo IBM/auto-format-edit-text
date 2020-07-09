@@ -2,12 +2,11 @@ package com.ibm.autoformatedittext;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.databinding.Observable;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.ibm.autoformatedittext.databinding.ActivityMainBinding;
+import com.ibm.autoformatedittext.model.EditTextState;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,24 +16,15 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         final FormatObservable observable = new FormatObservable();
-        observable.format.set("+1(###) ###-####");
         binding.setObservable(observable);
 
-//        binding.phoneNumberAutoFormatEditText.setOnChangeListener(
-//                new AbstractAutoEditText.AutoFormatTextChangeListener() {
+//        binding.phoneNumberAutoFormatEditText.setMaskingInputFilter(
+//                new FormattedEditText.MaskingInputFilter() {
 //                    @Override
-//                    public void onUnformattedTextChanged(String text) {
-//                        Log.i("XXX", text);
+//                    public EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
+//                        String newText = textAfter.length() > textBefore.length() ? textAfter + "-" : textAfter;
+//                        return new EditTextState(newText, newText, newText.length());
 //                    }
-//        });
-
-//        observable.formattedText.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-//            @Override
-//            public void onPropertyChanged(Observable sender, int propertyId) {
-//                Log.i("XXX", observable.formattedText.get());
-//            }
-//        });
-
-
+//                });
     }
 }

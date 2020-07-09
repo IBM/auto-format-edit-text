@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="AutoFormatEditText">
-        <attr name="format" format="string" />
-        <attr name="placeholder" format="string" />
+        <attr name="inputMask" format="string" />
+        <attr name="inputMaskPlaceholder" format="string" />
+        <attr name="hideModeFormat" format="string" />
+        <attr name="shiftModeEnabled" format="boolean" />
     </declare-styleable>
 </resources>

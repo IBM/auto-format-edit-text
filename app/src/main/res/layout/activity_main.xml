@@ -12,39 +12,79 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Format"/>
-        <androidx.appcompat.widget.AppCompatEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="@={observable.format}"
-            android:hint="####" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Formatted value"/>
+            android:text="Input value"/>
         <com.ibm.autoformatedittext.AutoFormatEditText
             android:id="@+id/phoneNumberAutoFormatEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:inputType="number"
+            android:typeface="monospace"
+            android:hint="@{observable.inputMask}"
             android:text="@={observable.formattedText}"
-            app:onTextChanged="@{observable::onTextChanged}"
+            android:enabled="@{observable.inputEnabled}"
+            app:onFormattedValueChanged="@{observable::onFormattedValueChanged}"
             app:onUnformattedValueChanged="@{observable::onUnformattedValueChanged}"
-            app:format="@{observable.format}"
-            app:placeholder="#" />
+            app:inputMask="@{observable.inputMask}"
+            app:hideModeFormat="@{observable.hideModeFormat}"
+            app:shiftModeEnabled="@{observable.shiftModeEnabled}"
+            app:hideModeEnabled="@{observable.hideModeEnabled}"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Unformatted Text"/>
+            android:text="Input Mask"/>
         <androidx.appcompat.widget.AppCompatEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:typeface="monospace"
+            android:text="@={observable.inputMask}"
+            android:hint="####" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hide mode format"/>
+        <androidx.appcompat.widget.AppCompatEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:typeface="monospace"
             android:layout_marginBottom="12dp"
-            android:inputType="number"
-            android:text="@={observable.unformattedText}"/>
+            android:text="@={observable.hideModeFormat}" />
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/static_text_enabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Input enabled"
+            android:checked="true"
+            android:onClick="@{observable::onToggleInputEnabledClick}"/>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/static_text_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hide mode enabled"
+            android:onClick="@{observable::onHideModeToggleClick}"/>
+        <androidx.appcompat.widget.AppCompatCheckBox
+            android:id="@+id/shift_mode_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shift mode enabled"
+            android:layout_marginBottom="12dp"
+            android:onClick="@{observable::onShiftModeToggleClick}"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{`Input Mask: ` + observable.inputMask}"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{`Hide mode format: ` + observable.hideModeFormat}"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{`Formatted Text: ` + observable.formattedText}"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="@{`Unformatted Text: ` + observable.unformattedText}"/>
     </LinearLayout>
 </layout>
 
