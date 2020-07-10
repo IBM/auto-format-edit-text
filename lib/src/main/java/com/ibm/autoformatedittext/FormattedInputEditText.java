@@ -13,6 +13,7 @@ import androidx.databinding.BindingMethods;
 
 import com.ibm.autoformatedittext.model.EditTextState;
 
+@SuppressWarnings("unused")
 @BindingMethods({
         @BindingMethod(type = FormattedInputEditText.class, attribute = "onFormattedValueChanged", method = "setFormattedValueChangedListener"),
         @BindingMethod(type = FormattedInputEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")

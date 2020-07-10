@@ -1,6 +1,6 @@
 package com.ibm.autoformatedittext.inputmask;
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class InputMask {
     private char placeholder;
     private String inputMaskString;

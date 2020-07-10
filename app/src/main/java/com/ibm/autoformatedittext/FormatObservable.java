@@ -1,6 +1,4 @@
 package com.ibm.autoformatedittext;
-
-import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 

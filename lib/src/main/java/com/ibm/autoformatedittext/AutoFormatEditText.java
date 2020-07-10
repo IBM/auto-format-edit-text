@@ -10,6 +10,7 @@ import com.carljmont.lib.R;
 import com.ibm.autoformatedittext.inputmask.DynamicMaskFilter;
 import com.ibm.autoformatedittext.util.HideFormatter;
 
+@SuppressWarnings("unused")
 public class AutoFormatEditText extends FormattedInputEditText {
     private String hideModeFormat;
     private DynamicMaskFilter dynamicMaskFilter;
