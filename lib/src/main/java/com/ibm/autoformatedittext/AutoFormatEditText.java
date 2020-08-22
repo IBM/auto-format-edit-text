@@ -41,12 +41,12 @@ public class AutoFormatEditText extends FormattedInputEditText {
 
     public void setInputMask(String inputMaskString) {
         dynamicMaskFilter.setMaskString(inputMaskString);
-        setText("");
+        //setText("");
     }
 
     private void setInputMaskPlaceholder(String placeholderString) {
         dynamicMaskFilter.setPlaceholder(placeholderString);
-        setText("");
+        //setText("");
     }
 
     private void setShiftModeEnabled(boolean enabled) {
