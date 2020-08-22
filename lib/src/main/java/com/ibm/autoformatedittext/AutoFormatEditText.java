@@ -39,7 +39,7 @@ public class AutoFormatEditText extends FormattedInputEditText {
         }
     }
 
-    private void setInputMask(String inputMaskString) {
+    public void setInputMask(String inputMaskString) {
         dynamicMaskFilter.setMaskString(inputMaskString);
         setText("");
     }
