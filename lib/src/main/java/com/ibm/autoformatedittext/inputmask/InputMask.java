@@ -1,30 +1,36 @@
 package com.ibm.autoformatedittext.inputmask;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
 public class InputMask {
     private char placeholder;
     private String inputMaskString;
     private Integer unformattedLength;
 
     public InputMask(String inputMaskString, char placeholder) {
-        this.inputMaskString = inputMaskString;
+        setInputMaskString(inputMaskString);
         this.placeholder = placeholder;
     }
 
     //Returns true if the character in the format at the specified index is the placeholder character
     public boolean isPlaceholder(int index) {
-        return index < inputMaskString.length() && inputMaskString.charAt(index) == placeholder;
+        return index >= 0 &&
+                index < inputMaskString.length() &&
+                inputMaskString.charAt(index) == placeholder;
     }
 
     //Returns true if the specified string matches the format
-    public boolean matches(String formattedString) {
-        if (inputMaskString.length() != formattedString.length()) {
+    //Returns false if there is no match
+    public boolean matches(String formattedText) {
+        if (formattedText == null) {
+            throw new IllegalArgumentException("Formatted text argument cannot be null.");
+        }
+
+        if (inputMaskString.length() != formattedText.length()) {
             return false;
         }
 
         for (int i = 0; i < inputMaskString.length(); i++) {
             char currentChar = inputMaskString.charAt(i);
-            if (currentChar != placeholder && currentChar != formattedString.charAt(i)) {
+            if (currentChar != placeholder && currentChar != formattedText.charAt(i)) {
                 return false;
             }
         }
@@ -49,7 +55,11 @@ public class InputMask {
     public String formatText(String unformattedText) {
         StringBuilder builder = new StringBuilder();
 
-        if (unformattedText.length() == 0) {
+        if (unformattedText == null) {
+            throw new IllegalArgumentException("Unformatted text argument cannot be null.");
+        }
+
+        if (unformattedText.isEmpty()) {
             return "";
         }
 
@@ -73,11 +83,13 @@ public class InputMask {
     public String unformatText(CharSequence formattedText, int start, int end) {
         StringBuilder builder = new StringBuilder();
 
-        if (formattedText.length() > 0) {
-            for (int i = start; i < end; i++) {
-                if (inputMaskString.charAt(i) == placeholder) {
-                    builder.append(formattedText.charAt(i));
-                }
+        if (formattedText == null) {
+            throw new IllegalArgumentException("Formatted text argument cannot be null.");
+        }
+
+        for (int i = start; i < end; i++) {
+            if (inputMaskString.charAt(i) == placeholder) {
+                builder.append(formattedText.charAt(i));
             }
         }
 
@@ -89,6 +101,10 @@ public class InputMask {
     }
 
     public void setInputMaskString(String inputMaskString) {
+        if (inputMaskString == null) {
+            throw new IllegalArgumentException("Input mask string cannot be null.");
+        }
+
         this.inputMaskString = inputMaskString;
         this.unformattedLength = null;
     }

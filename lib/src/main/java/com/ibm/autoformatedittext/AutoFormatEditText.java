@@ -34,6 +34,10 @@ public class AutoFormatEditText extends FormattedInputEditText {
             boolean shiftModeEnabled = a.getBoolean(R.styleable.AutoFormatEditText_shiftModeEnabled, false);
             a.recycle();
 
+            if (inputMaskString == null) {
+                inputMaskString = "";
+            }
+
             dynamicMaskFilter = new DynamicMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
             setMaskingInputFilter(dynamicMaskFilter);
         }
