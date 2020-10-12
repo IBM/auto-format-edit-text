@@ -19,6 +19,7 @@ import com.ibm.autoformatedittext.model.EditTextState;
         @BindingMethod(type = FormattedInputEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")
 })
 public class FormattedInputEditText extends AppCompatEditText {
+    //TODO: Do we need two different listeners?
     private UnformattedValueListener onUnformattedValueListener;
     private FormattedValueListener onFormattedValueListener;
     private MaskingInputFilter maskingInputFilter;
@@ -39,6 +40,7 @@ public class FormattedInputEditText extends AppCompatEditText {
         init(context, attrs);
     }
 
+    //TODO: Null check on attrs? We pass null in the first constructor
     void init(Context context, AttributeSet attrs) {
         setUpTextWatcher();
 
@@ -49,6 +51,7 @@ public class FormattedInputEditText extends AppCompatEditText {
         }
     }
 
+    //TODO: Can this be abstract? In fact can this entire class be abstract?
     public String getHideModeText(String unformattedText) {
         return unformattedText;
     }
@@ -63,12 +66,14 @@ public class FormattedInputEditText extends AppCompatEditText {
         }
     }
 
+    //TODO: Should the user pass in whatever they want instead of forcing use of unformattedText?
     public void refreshHideModeText() {
         if (hideModeEnabled) {
             setTextNoWatch(getHideModeText(unformattedText));
         }
     }
 
+    //TODO: Should we set up text watcher if it is not going to be used? We seem to call this in all cases
     private void setUpTextWatcher() {
         removeTextChangedListener(textWatcher);
 
@@ -161,6 +166,7 @@ public class FormattedInputEditText extends AppCompatEditText {
         this.maskingInputFilter = maskingInputFilter;
     }
 
+    //TODO: Why?
     @BindingAdapter("android:text")
     public static void setTextAndroid(FormattedInputEditText editText, String newText) {
         editText.setNewText(newText);

@@ -50,6 +50,7 @@ public class HideFormatter {
             return "";
         }
 
+        //TODO: Can't we just use substring directly? Ex: s.substring(startIndex, endIndex + 1)
         StringBuilder replacementBuilder = new StringBuilder();
         for (int i = startIndex; i <= endIndex; i++) {
             replacementBuilder.append(s.substring(i, i + 1));

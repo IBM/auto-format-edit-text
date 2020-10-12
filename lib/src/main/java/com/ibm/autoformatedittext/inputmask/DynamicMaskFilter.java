@@ -46,6 +46,7 @@ public class DynamicMaskFilter implements FormattedInputEditText.MaskingInputFil
         if (textAfter.length() > inputMask.getInputMaskString().length()
                 && selectionLength != replacementLength && selectionStart > 0
                 && !inputMask.matches(textAfter)) {
+            //TODO: Wouldn't it be helpful if we were passed the unformatted text rather than recalculating it
             String newUnformattedText = inputMask.unformatText(textBefore, 0, textBefore.length());
             return new EditTextState(textBefore, newUnformattedText, selectionStart);
         }
