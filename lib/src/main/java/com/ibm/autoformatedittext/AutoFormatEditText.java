@@ -34,10 +34,6 @@ public class AutoFormatEditText extends FormattedInputEditText {
             boolean shiftModeEnabled = a.getBoolean(R.styleable.AutoFormatEditText_shiftModeEnabled, false);
             a.recycle();
 
-            if (inputMaskString == null) {
-                inputMaskString = "";
-            }
-
             dynamicMaskFilter = new DynamicMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
             setMaskingInputFilter(dynamicMaskFilter);
         }
@@ -48,22 +44,22 @@ public class AutoFormatEditText extends FormattedInputEditText {
         setText("");
     }
 
-    private void setInputMaskPlaceholder(String placeholderString) {
+    public void setInputMaskPlaceholder(String placeholderString) {
         dynamicMaskFilter.setPlaceholder(placeholderString);
         setText("");
     }
 
-    private void setShiftModeEnabled(boolean enabled) {
+    public void setShiftModeEnabled(boolean enabled) {
         dynamicMaskFilter.setShiftModeEnabled(enabled);
     }
 
-    private void setHideModeFormat(String staticFormat) {
+    public void setHideModeFormat(String staticFormat) {
         this.hideModeFormat = staticFormat;
-        refreshHideModeReplacementText();
+        refreshHideModeText();
     }
 
     @Override
-    public String getHideModeReplacementText(String unformattedText) {
+    public String getHideModeText(String unformattedText) {
         return HideFormatter.format(unformattedText, hideModeFormat);
     }
 

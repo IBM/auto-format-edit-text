@@ -49,7 +49,7 @@ public class FormattedInputEditText extends AppCompatEditText {
         }
     }
 
-    public String getHideModeReplacementText(String unformattedText) {
+    public String getHideModeText(String unformattedText) {
         return unformattedText;
     }
 
@@ -57,15 +57,15 @@ public class FormattedInputEditText extends AppCompatEditText {
         this.hideModeEnabled = enabled;
 
         if (enabled) {
-            setTextNoWatch(getHideModeReplacementText(unformattedText));
+            setTextNoWatch(getHideModeText(unformattedText));
         }else {
             setNewText(unformattedText);
         }
     }
 
-    public void refreshHideModeReplacementText() {
+    public void refreshHideModeText() {
         if (hideModeEnabled) {
-            setTextNoWatch(getHideModeReplacementText(unformattedText));
+            setTextNoWatch(getHideModeText(unformattedText));
         }
     }
 

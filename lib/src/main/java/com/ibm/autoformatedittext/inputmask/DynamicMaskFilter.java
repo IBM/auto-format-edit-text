@@ -9,6 +9,10 @@ public class DynamicMaskFilter implements FormattedInputEditText.MaskingInputFil
     private boolean shiftModeEnabled;
 
     public DynamicMaskFilter(String maskString, String placeholderString, boolean shiftModeEnabled) {
+        if (maskString == null) {
+            maskString = "";
+        }
+
         this.inputMask = new InputMask(maskString, getPlaceholder(placeholderString));
         this.shiftModeEnabled = shiftModeEnabled;
     }

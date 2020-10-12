@@ -12,11 +12,6 @@ public class InputMaskTest {
         assertEquals('#', mask.getPlaceholder());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testConstructor2() {
-        new InputMask(null, '#');
-    }
-
     @Test
     public void testIsPlaceholder1() {
         InputMask mask = new InputMask("", '#');
@@ -110,12 +105,6 @@ public class InputMaskTest {
         assertTrue(mask.isPlaceholder(0));
         assertTrue(mask.isPlaceholder(2));
         assertTrue(mask.isPlaceholder(4));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testMatches1() {
-        InputMask mask = new InputMask("", '#');
-        mask.matches(null);
     }
 
     @Test
@@ -286,12 +275,6 @@ public class InputMaskTest {
         assertEquals(3, mask.getUnformattedLength());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testFormatText1() {
-        InputMask mask = new InputMask("", '#');
-        mask.formatText(null);
-    }
-
     @Test
     public void testFormatText2() {
         InputMask mask = new InputMask("", '#');
@@ -380,12 +363,6 @@ public class InputMaskTest {
         assertEquals("0/1/", mask.formatText("01"));
         assertEquals("0/1/2", mask.formatText("012"));
         assertEquals("0/1/2", mask.formatText("0123"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testUnformatText1() {
-        InputMask mask = new InputMask("", '#');
-        mask.unformatText(null, 0, 0);
     }
 
     @Test
@@ -563,12 +540,6 @@ public class InputMaskTest {
         InputMask mask = new InputMask("", '#');
         mask.setInputMaskString("###");
         assertEquals("###", mask.getInputMaskString());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetInputMaskString2() {
-        InputMask mask = new InputMask("", '#');
-        mask.setInputMaskString(null);
     }
 
     @Test

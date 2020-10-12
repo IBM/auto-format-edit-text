@@ -1,11 +1,13 @@
 package com.ibm.autoformatedittext.inputmask;
 
+import androidx.annotation.NonNull;
+
 public class InputMask {
     private char placeholder;
     private String inputMaskString;
     private Integer unformattedLength;
 
-    public InputMask(String inputMaskString, char placeholder) {
+    public InputMask(@NonNull String inputMaskString, char placeholder) {
         setInputMaskString(inputMaskString);
         this.placeholder = placeholder;
     }
@@ -19,11 +21,7 @@ public class InputMask {
 
     //Returns true if the specified string matches the format
     //Returns false if there is no match
-    public boolean matches(String formattedText) {
-        if (formattedText == null) {
-            throw new IllegalArgumentException("Formatted text argument cannot be null.");
-        }
-
+    public boolean matches(@NonNull String formattedText) {
         if (inputMaskString.length() != formattedText.length()) {
             return false;
         }
@@ -52,12 +50,8 @@ public class InputMask {
         return unformattedLength;
     }
 
-    public String formatText(String unformattedText) {
+    public String formatText(@NonNull String unformattedText) {
         StringBuilder builder = new StringBuilder();
-
-        if (unformattedText == null) {
-            throw new IllegalArgumentException("Unformatted text argument cannot be null.");
-        }
 
         if (unformattedText.isEmpty()) {
             return "";
@@ -80,12 +74,8 @@ public class InputMask {
         return builder.toString();
     }
 
-    public String unformatText(CharSequence formattedText, int start, int end) {
+    public String unformatText(@NonNull CharSequence formattedText, int start, int end) {
         StringBuilder builder = new StringBuilder();
-
-        if (formattedText == null) {
-            throw new IllegalArgumentException("Formatted text argument cannot be null.");
-        }
 
         for (int i = start; i < end; i++) {
             if (inputMaskString.charAt(i) == placeholder) {
@@ -100,11 +90,7 @@ public class InputMask {
         return inputMaskString;
     }
 
-    public void setInputMaskString(String inputMaskString) {
-        if (inputMaskString == null) {
-            throw new IllegalArgumentException("Input mask string cannot be null.");
-        }
-
+    public void setInputMaskString(@NonNull String inputMaskString) {
         this.inputMaskString = inputMaskString;
         this.unformattedLength = null;
     }
