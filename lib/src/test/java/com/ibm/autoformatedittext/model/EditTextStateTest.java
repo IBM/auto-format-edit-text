@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 
 public class EditTextStateTest {
     @Test
-    public void testConstructor1() {
+    public void constructorTest() {
         EditTextState editTextState = new EditTextState("07/19/1993", "07191993", 0, 5);
         assertEquals("07/19/1993", editTextState.getFormattedText());
         assertEquals("07191993", editTextState.getUnformattedText());
@@ -15,7 +15,7 @@ public class EditTextStateTest {
     }
 
     @Test
-    public void testConstructor2() {
+    public void constructorTest_noRange() {
         EditTextState editTextState = new EditTextState("07/19/1993", "07191993", 0);
         assertEquals("07/19/1993", editTextState.getFormattedText());
         assertEquals("07191993", editTextState.getUnformattedText());

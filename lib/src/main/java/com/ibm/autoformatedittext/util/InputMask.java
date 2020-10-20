@@ -1,4 +1,4 @@
-package com.ibm.autoformatedittext.inputmask;
+package com.ibm.autoformatedittext.util;
 
 import androidx.annotation.NonNull;
 

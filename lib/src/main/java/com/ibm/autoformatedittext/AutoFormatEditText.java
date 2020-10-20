@@ -7,13 +7,14 @@ import android.util.AttributeSet;
 import androidx.databinding.BindingAdapter;
 
 import com.carljmont.lib.R;
-import com.ibm.autoformatedittext.inputmask.DynamicMaskFilter;
+import com.ibm.autoformatedittext.model.EditTextState;
 import com.ibm.autoformatedittext.util.HideFormatter;
+import com.ibm.autoformatedittext.util.SimpleMaskFilter;
 
 @SuppressWarnings("unused")
 public class AutoFormatEditText extends FormattedInputEditText {
     private String hideModeFormat;
-    private DynamicMaskFilter dynamicMaskFilter;
+    private SimpleMaskFilter simpleMaskFilter;
 
     public AutoFormatEditText(Context context) {
         super(context);
@@ -24,7 +25,7 @@ public class AutoFormatEditText extends FormattedInputEditText {
     }
 
     @Override
-    void init(Context context, AttributeSet attrs) {
+    public void init(Context context, AttributeSet attrs) {
         super.init(context, attrs);
 
         if (attrs != null) {
@@ -34,33 +35,48 @@ public class AutoFormatEditText extends FormattedInputEditText {
             boolean shiftModeEnabled = a.getBoolean(R.styleable.AutoFormatEditText_shiftModeEnabled, false);
             a.recycle();
 
-            dynamicMaskFilter = new DynamicMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
-            setMaskingInputFilter(dynamicMaskFilter);
+            simpleMaskFilter = new SimpleMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
         }
     }
 
     public void setInputMask(String inputMaskString) {
-        dynamicMaskFilter.setMaskString(inputMaskString);
+        simpleMaskFilter.setMaskString(inputMaskString);
         setText("");
     }
 
     public void setInputMaskPlaceholder(String placeholderString) {
-        dynamicMaskFilter.setPlaceholder(placeholderString);
+        simpleMaskFilter.setPlaceholder(placeholderString);
         setText("");
     }
 
     public void setShiftModeEnabled(boolean enabled) {
-        dynamicMaskFilter.setShiftModeEnabled(enabled);
+        simpleMaskFilter.setShiftModeEnabled(enabled);
     }
 
     public void setHideModeFormat(String staticFormat) {
         this.hideModeFormat = staticFormat;
-        refreshHideModeText();
+
+        if (hideModeEnabled) {
+            updateHideModeText();
+        }
     }
 
     @Override
-    public String getHideModeText(String unformattedText) {
+    public String getHideModeText(String unformattedText, String formattedText) {
         return HideFormatter.format(unformattedText, hideModeFormat);
+    }
+
+    @Override
+    public EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
+        if (simpleMaskFilter == null) {
+            return null; //Null state will be ignored
+        }
+
+        return simpleMaskFilter.filter(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
+    }
+
+    public SimpleMaskFilter getSimpleMaskFilter() {
+        return simpleMaskFilter;
     }
 
     @BindingAdapter("inputMask")

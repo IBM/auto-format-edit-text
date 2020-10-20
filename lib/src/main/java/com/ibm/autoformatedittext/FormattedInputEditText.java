@@ -15,20 +15,14 @@ import com.ibm.autoformatedittext.model.EditTextState;
 
 @SuppressWarnings("unused")
 @BindingMethods({
-        @BindingMethod(type = FormattedInputEditText.class, attribute = "onFormattedValueChanged", method = "setFormattedValueChangedListener"),
-        @BindingMethod(type = FormattedInputEditText.class, attribute = "onUnformattedValueChanged", method = "setUnformattedValueChangedListener")
+        @BindingMethod(type = FormattedInputEditText.class, attribute = "onValueChanged", method = "setChangeListener"),
 })
-public class FormattedInputEditText extends AppCompatEditText {
-    //TODO: Do we need two different listeners?
-    private UnformattedValueListener onUnformattedValueListener;
-    private FormattedValueListener onFormattedValueListener;
-    private MaskingInputFilter maskingInputFilter;
-
+public abstract class FormattedInputEditText extends AppCompatEditText {
+    private ChangeListener changeListener;
     private TextWatcher textWatcher;
 
     public boolean hideModeEnabled;
-    private String textBefore;
-    private String formattedText, unformattedText;
+    private String textBefore, formattedText, unformattedText;
 
     public FormattedInputEditText(Context context) {
         super(context);
@@ -40,8 +34,10 @@ public class FormattedInputEditText extends AppCompatEditText {
         init(context, attrs);
     }
 
-    //TODO: Null check on attrs? We pass null in the first constructor
-    void init(Context context, AttributeSet attrs) {
+    public abstract String getHideModeText(String unformattedText, String formattedText);
+    public abstract EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
+
+    public void init(Context context, AttributeSet attrs) {
         setUpTextWatcher();
 
         //Prevents edge case where multiple callbacks are occurring for input type 'text'
@@ -51,26 +47,19 @@ public class FormattedInputEditText extends AppCompatEditText {
         }
     }
 
-    //TODO: Can this be abstract? In fact can this entire class be abstract?
-    public String getHideModeText(String unformattedText) {
-        return unformattedText;
-    }
-
     public void setHideModeEnabled(boolean enabled) {
         this.hideModeEnabled = enabled;
 
         if (enabled) {
-            setTextNoWatch(getHideModeText(unformattedText));
+            updateHideModeText();
         }else {
             setNewText(unformattedText);
         }
     }
 
-    //TODO: Should the user pass in whatever they want instead of forcing use of unformattedText?
-    public void refreshHideModeText() {
-        if (hideModeEnabled) {
-            setTextNoWatch(getHideModeText(unformattedText));
-        }
+    public void updateHideModeText() {
+        String s = getHideModeText(unformattedText, formattedText);
+        setTextNoWatch(s);
     }
 
     //TODO: Should we set up text watcher if it is not going to be used? We seem to call this in all cases
@@ -102,48 +91,66 @@ public class FormattedInputEditText extends AppCompatEditText {
         textWatcher = null;
     }
 
-    public void handleOnTextChanged(CharSequence s, int selectionStart, int selectionLength, int replacementLength) {
+    private void handleOnTextChanged(CharSequence s, int start, int before, int count) {
         if (hideModeEnabled) {
             setTextNoWatch(textBefore);
-            setSelection(selectionStart + selectionLength);
+            setSelection(start + before);
             return;
         }
 
-        if (maskingInputFilter != null) {
-            EditTextState newEditTextState = maskingInputFilter.filter(textBefore, s.toString(), selectionStart, selectionLength, replacementLength);
 
-            if (formattedText == null || !formattedText.equals(newEditTextState.getFormattedText())) {
+        String insertedText = s.subSequence(start, start + count).toString();
+        EditTextState previousEditTextState = new EditTextState(textBefore, null, start, start + before);
+        boolean backspaced = before == 0 && textBefore.length() > s.length();
+
+        EditTextState newEditTextState = filter(textBefore, s.toString(), start, before, count);
+
+        if (newEditTextState != null) {
+            boolean formattedTextChanged = formattedText == null || !formattedText.equals(newEditTextState.getFormattedText());
+            if (formattedTextChanged) {
                 formattedText = newEditTextState.getFormattedText();
-                if (onFormattedValueListener != null) {
-                    onFormattedValueListener.onFormattedValueChanged(formattedText);
-                }
             }
 
-            if (unformattedText == null || !unformattedText.equals(newEditTextState.getUnformattedText())) {
+            boolean unformattedTextChanged= unformattedText == null || !unformattedText.equals(newEditTextState.getUnformattedText());
+            if (unformattedTextChanged) {
                 unformattedText = newEditTextState.getUnformattedText();
-                if (onUnformattedValueListener != null) {
-                    onUnformattedValueListener.onUnformattedValueChanged(unformattedText);
-                }
             }
 
             setTextNoWatch(formattedText);
 
-            //Setting text programmatically resets the cursor, so this will reposition it
+            //When we set the text programmatically, the cursor returns to position 0. This repositions the cursor/selection
             setSelection(newEditTextState.getCursorStart(), newEditTextState.getCursorEnd());
+
+            if (changeListener != null &&
+                    (formattedTextChanged || unformattedTextChanged)) {
+                changeListener.onValueChanged(unformattedText, formattedText);
+            }
         }
     }
 
-    private void setTextNoWatch(String s) {
+    public void setTextNoWatch(String s) {
         removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
         setNewText(s);
         addTextChangedListener(textWatcher);
     }
 
-    private void setNewText(CharSequence s) {
+    public void setNewText(CharSequence s) {
         if (s != null && getText() != null &&
                 !getText().toString().equals(s.toString())) {
             setText(s);
         }
+    }
+
+    public ChangeListener getChangeListener() {
+        return changeListener;
+    }
+
+    public TextWatcher getTextWatcher() {
+        return textWatcher;
+    }
+
+    public boolean getHideModeEnabled() {
+        return hideModeEnabled;
     }
 
     public String getUnformattedText() {
@@ -154,19 +161,10 @@ public class FormattedInputEditText extends AppCompatEditText {
         return formattedText;
     }
 
-    public void setUnformattedValueChangedListener(UnformattedValueListener listener) {
-        onUnformattedValueListener = listener;
+    public void setChangeListener(ChangeListener changeListener) {
+        this.changeListener = changeListener;
     }
 
-    public void setFormattedValueChangedListener(FormattedValueListener listener) {
-        onFormattedValueListener = listener;
-    }
-
-    public void setMaskingInputFilter(MaskingInputFilter maskingInputFilter) {
-        this.maskingInputFilter = maskingInputFilter;
-    }
-
-    //TODO: Why?
     @BindingAdapter("android:text")
     public static void setTextAndroid(FormattedInputEditText editText, String newText) {
         editText.setNewText(newText);
@@ -177,16 +175,7 @@ public class FormattedInputEditText extends AppCompatEditText {
         editText.setHideModeEnabled(enabled);
     }
 
-    public interface UnformattedValueListener {
-        void onUnformattedValueChanged(String value);
-    }
-
-    public interface FormattedValueListener {
-        void onFormattedValueChanged(String text);
-    }
-
-    public interface MaskingInputFilter {
-        EditTextState filter(String textBefore, String textAfter,
-                             int selectionStart, int selectionLength, int replacementLength);
+    public interface ChangeListener {
+        void onValueChanged(String unformattedValue, String formattedValue);
     }
 }

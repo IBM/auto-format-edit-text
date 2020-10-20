@@ -1,4 +1,6 @@
-package com.ibm.autoformatedittext.inputmask;
+package com.ibm.autoformatedittext.util;
+
+import com.ibm.autoformatedittext.util.InputMask;
 
 import org.junit.*;
 
@@ -6,28 +8,28 @@ import static org.junit.Assert.*;
 
 public class InputMaskTest {
     @Test
-    public void testConstructor1() {
+    public void testConstructor() {
         InputMask mask = new InputMask("0", '#');
         assertEquals("0", mask.getInputMaskString());
         assertEquals('#', mask.getPlaceholder());
     }
 
     @Test
-    public void testIsPlaceholder1() {
+    public void testIsPlaceholder_emptyMask() {
         InputMask mask = new InputMask("", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(0));
     }
 
     @Test
-    public void testIsPlaceholder2() {
+    public void testIsPlaceholder_lengthOneNonPlaceholder() {
         InputMask mask = new InputMask("/",'#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(0));
     }
 
     @Test
-    public void testIsPlaceholder3() {
+    public void testIsPlaceholder_lengthOnePlaceholder() {
         InputMask mask = new InputMask("#", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(1));
@@ -35,7 +37,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testIsPlaceholder4() {
+    public void testIsPlaceholder_startsWithNonPlaceholder() {
         InputMask mask = new InputMask("/##", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(0));
@@ -45,7 +47,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testIsPlaceholder5() {
+    public void testIsPlaceholder_startsWithPlaceholder() {
         InputMask mask = new InputMask("#//", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(1));
@@ -54,7 +56,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testIsPlaceholder6() {
+    public void testIsPlaceholder_noPlaceholders() {
         InputMask mask = new InputMask("///", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(0));
@@ -64,7 +66,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testIsPlaceholder7() {
+    public void testIsPlaceholder_allPlaceholders() {
         InputMask mask = new InputMask("###", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(3));
@@ -74,7 +76,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testIsPlaceholder8() {
+    public void testIsPlaceholder_sequentialNonPlaceholders() {
         InputMask mask = new InputMask("#//#", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(1));
@@ -85,7 +87,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testIsPlaceholder9() {
+    public void testIsPlaceholder_sequentialPlaceholders() {
         InputMask mask = new InputMask("#/##", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(1));
@@ -96,7 +98,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testIsPlaceholder10() {
+    public void testIsPlaceholder_alternating() {
         InputMask mask = new InputMask("#/#/#", '#');
         assertFalse(mask.isPlaceholder(-1));
         assertFalse(mask.isPlaceholder(1));
@@ -108,14 +110,14 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches2() {
+    public void testMatches_emptyMask() {
         InputMask mask = new InputMask("", '#');
         assertFalse(mask.matches("0"));
         assertTrue(mask.matches(""));
     }
 
     @Test
-    public void testMatches3() {
+    public void testMatches_lengthOneNonPlaceholder() {
         InputMask mask = new InputMask("/", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("0"));
@@ -126,7 +128,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches4() {
+    public void testMatches_lengthOnePlacholder() {
         InputMask mask = new InputMask("#", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("0/"));
@@ -137,7 +139,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches5() {
+    public void testMatches_startsWithNonPlaceholder() {
         InputMask mask = new InputMask("/##", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("/0"));
@@ -147,7 +149,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches6() {
+    public void testMatches_startsWithPlaceholder() {
         InputMask mask = new InputMask("##/", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("0/"));
@@ -158,7 +160,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches7() {
+    public void testMatches_noPlaceholders() {
         InputMask mask = new InputMask("///", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("000"));
@@ -168,7 +170,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches8() {
+    public void testMatches_allPlaceholders() {
         InputMask mask = new InputMask("###", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("00"));
@@ -178,7 +180,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches9() {
+    public void testMatches_sequentialNonPlaceholders() {
         InputMask mask = new InputMask("#//#", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("0//"));
@@ -190,7 +192,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches10() {
+    public void testMatches_sequentialPlaceholders() {
         InputMask mask = new InputMask("#/##", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("0/0"));
@@ -203,7 +205,7 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testMatches11() {
+    public void testMatches_alternating() {
         InputMask mask = new InputMask("#/#/#", '#');
         assertFalse(mask.matches(""));
         assertFalse(mask.matches("0/0/"));
@@ -366,20 +368,20 @@ public class InputMaskTest {
     }
 
     @Test
-    public void testUnformatText2() {
+    public void testUnformatText_emptyMask() {
         InputMask mask = new InputMask("", '#');
         assertEquals("", mask.unformatText("", 0, 0));
     }
 
     @Test
-    public void testUnformatText3() {
+    public void testUnformatText_lengthOneNonPlaceholder() {
         InputMask mask = new InputMask("/", '#');
         assertEquals("", mask.unformatText("/", 0, 0));
         assertEquals("", mask.unformatText("/", 0, 1));
     }
 
     @Test
-    public void testUnformatText4() {
+    public void testUnformatText_lengthOnePlaceholder() {
         InputMask mask = new InputMask("#", '#');
         assertEquals("", mask.unformatText("0", 0, 0));
         assertEquals("0", mask.unformatText("0", 0, 1));

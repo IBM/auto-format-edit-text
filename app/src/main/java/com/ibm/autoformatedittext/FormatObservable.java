@@ -15,13 +15,8 @@ public class FormatObservable {
     public ObservableField<Boolean> shiftModeEnabled = new ObservableField<>(false);
     public ObservableField<Boolean> hideModeEnabled = new ObservableField<>(false);
 
-    public void onUnformattedValueChanged(String value) {
-        unformattedText.set(value);
-        Log.i("Unformatted", value + "...");
-    }
-
-    public void onFormattedValueChanged(String text) {
-        Log.i("Formatted", text + "...");
+    public void onValueChanged(String unformattedText, String formattedText) {
+        Log.i("FormatObservable", "Unformatted: " + unformattedText + ", Formatted: " + formattedText);
     }
 
     public void onToggleInputEnabledClick(View v) {
