@@ -8,6 +8,7 @@ import androidx.databinding.BindingAdapter;
 
 import com.carljmont.lib.R;
 import com.ibm.autoformatedittext.model.EditTextState;
+import com.ibm.autoformatedittext.util.TextChangeEvent;
 import com.ibm.autoformatedittext.util.HideFormatter;
 import com.ibm.autoformatedittext.util.SimpleMaskFilter;
 
@@ -36,11 +37,16 @@ public class AutoFormatEditText extends FormattedInputEditText {
             a.recycle();
 
             simpleMaskFilter = new SimpleMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
+
+            if (inputMaskString != null && inputMaskString.length() > 0) {
+                startFormatting();
+            }
         }
     }
 
     public void setInputMask(String inputMaskString) {
         simpleMaskFilter.setMaskString(inputMaskString);
+        setFormattingEnabled(inputMaskString != null && inputMaskString.length() > 0);
         setText("");
     }
 
@@ -67,12 +73,8 @@ public class AutoFormatEditText extends FormattedInputEditText {
     }
 
     @Override
-    public EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
-        if (simpleMaskFilter == null) {
-            return null; //Null state will be ignored
-        }
-
-        return simpleMaskFilter.filter(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
+    public EditTextState format(TextChangeEvent textChangeEvent) {
+        return simpleMaskFilter.filter(textChangeEvent);
     }
 
     public SimpleMaskFilter getSimpleMaskFilter() {

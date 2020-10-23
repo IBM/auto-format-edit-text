@@ -12,18 +12,20 @@ public class SimpleMaskFilterTest {
         SimpleMaskFilter maskFilter = new SimpleMaskFilter("##/##/##", "#", true);
 
         //Insert at beginning
-        EditTextState newEditTextState = maskFilter.filter("ab/cd/", "efab/cd/", 0, 0, 2);
+        TextChangeEvent event = new TextChangeEvent("ab/cd/", "efab/cd/", 0, 0, 2);
+        EditTextState newEditTextState = maskFilter.filter(event);
         assertEquals("efabcd", newEditTextState.getUnformattedText());
         assertEquals("ef/ab/cd", newEditTextState.getFormattedText());
-        assertEquals(3, newEditTextState.getCursorStart());
-        assertEquals(3, newEditTextState.getCursorEnd());
+        assertEquals(3, newEditTextState.getSelectionStart());
+        assertEquals(3, newEditTextState.getSelectionEnd());
 
         //Insert at end
-        newEditTextState = maskFilter.filter("ab/cd/", "ab/cd/ef", 6, 6, 2);
+        event = new TextChangeEvent("ab/cd/", "ab/cd/ef", 6, 6, 2);
+        newEditTextState = maskFilter.filter(event);
         assertEquals("abcdef", newEditTextState.getUnformattedText());
         assertEquals("ab/cd/ef", newEditTextState.getFormattedText());
-        assertEquals(8, newEditTextState.getCursorStart());
-        assertEquals(8, newEditTextState.getCursorEnd());
+        assertEquals(8, newEditTextState.getSelectionStart());
+        assertEquals(8, newEditTextState.getSelectionEnd());
 
 
 

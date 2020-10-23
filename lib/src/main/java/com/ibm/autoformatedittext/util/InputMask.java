@@ -19,8 +19,7 @@ public class InputMask {
                 inputMaskString.charAt(index) == placeholder;
     }
 
-    //Returns true if the specified string matches the format
-    //Returns false if there is no match
+    //Returns true if the specified string matches the format, false if there is no match
     public boolean matches(@NonNull String formattedText) {
         if (inputMaskString.length() != formattedText.length()) {
             return false;
@@ -74,7 +73,7 @@ public class InputMask {
         return builder.toString();
     }
 
-    public String unformatText(@NonNull CharSequence formattedText, int start, int end) {
+    public String unformatText(@NonNull String formattedText, int start, int end) {
         StringBuilder builder = new StringBuilder();
 
         for (int i = start; i < end; i++) {

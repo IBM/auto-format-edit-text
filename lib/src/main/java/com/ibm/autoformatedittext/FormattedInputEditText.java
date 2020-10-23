@@ -12,6 +12,7 @@ import androidx.databinding.BindingMethod;
 import androidx.databinding.BindingMethods;
 
 import com.ibm.autoformatedittext.model.EditTextState;
+import com.ibm.autoformatedittext.util.TextChangeEvent;
 
 @SuppressWarnings("unused")
 @BindingMethods({
@@ -35,36 +36,14 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
     }
 
     public abstract String getHideModeText(String unformattedText, String formattedText);
-    public abstract EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength);
+    public abstract EditTextState format(TextChangeEvent textChangeEvent);
 
     public void init(Context context, AttributeSet attrs) {
-        setUpTextWatcher();
-
         //Prevents edge case where multiple callbacks are occurring for input type 'text'
         if (getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE) ||
                 getInputType() == InputType.TYPE_CLASS_TEXT || getInputType() == InputType.TYPE_TEXT_FLAG_MULTI_LINE) {
             setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
-    }
-
-    public void setHideModeEnabled(boolean enabled) {
-        this.hideModeEnabled = enabled;
-
-        if (enabled) {
-            updateHideModeText();
-        }else {
-            setNewText(unformattedText);
-        }
-    }
-
-    public void updateHideModeText() {
-        String s = getHideModeText(unformattedText, formattedText);
-        setTextNoWatch(s);
-    }
-
-    //TODO: Should we set up text watcher if it is not going to be used? We seem to call this in all cases
-    private void setUpTextWatcher() {
-        removeTextChangedListener(textWatcher);
 
         textWatcher = new TextWatcher() {
             @Override
@@ -80,8 +59,34 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
             @Override
             public void afterTextChanged(Editable s) {}
         };
+    }
 
-        addTextChangedListener(textWatcher);
+    public void setHideModeEnabled(boolean enabled) {
+        this.hideModeEnabled = enabled;
+
+        if (enabled) {
+            updateHideModeText();
+        }else {
+            setNewText(unformattedText);
+        }
+    }
+
+    public void updateHideModeText() {
+        String s = getHideModeText(unformattedText, formattedText);
+        setTextNoFormat(s);
+    }
+
+    public void setFormattingEnabled(boolean shouldListen) {
+        removeTextChangedListener(textWatcher);
+
+        if (shouldListen) {
+            addTextChangedListener(textWatcher);
+        }
+    }
+
+    //Call is required by a subclass before this class will call format method
+    public void startFormatting() {
+        setFormattingEnabled(true);
     }
 
     @Override
@@ -93,17 +98,19 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
 
     private void handleOnTextChanged(CharSequence s, int start, int before, int count) {
         if (hideModeEnabled) {
-            setTextNoWatch(textBefore);
+            setTextNoFormat(textBefore);
             setSelection(start + before);
             return;
         }
 
+        TextChangeEvent textChangeEvent = new TextChangeEvent(textBefore, s.toString(), start, before, count);
+        EditTextState newEditTextState = format(textChangeEvent);
 
-        String insertedText = s.subSequence(start, start + count).toString();
-        EditTextState previousEditTextState = new EditTextState(textBefore, null, start, start + before);
-        boolean backspaced = before == 0 && textBefore.length() > s.length();
-
-        EditTextState newEditTextState = filter(textBefore, s.toString(), start, before, count);
+        if (newEditTextState == null) {
+            setTextNoFormat(textBefore);
+            setSelection(start + before);
+            return;
+        }
 
         if (newEditTextState != null) {
             boolean formattedTextChanged = formattedText == null || !formattedText.equals(newEditTextState.getFormattedText());
@@ -116,10 +123,10 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
                 unformattedText = newEditTextState.getUnformattedText();
             }
 
-            setTextNoWatch(formattedText);
+            setTextNoFormat(formattedText); //Unformatted text must be set beforehand
 
             //When we set the text programmatically, the cursor returns to position 0. This repositions the cursor/selection
-            setSelection(newEditTextState.getCursorStart(), newEditTextState.getCursorEnd());
+            setSelection(newEditTextState.getSelectionStart(), newEditTextState.getSelectionEnd());
 
             if (changeListener != null &&
                     (formattedTextChanged || unformattedTextChanged)) {
@@ -128,7 +135,7 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
         }
     }
 
-    public void setTextNoWatch(String s) {
+    public void setTextNoFormat(String s) {
         removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
         setNewText(s);
         addTextChangedListener(textWatcher);

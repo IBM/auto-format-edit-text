@@ -16,10 +16,6 @@ public class SimpleMaskFilter {
         this.shiftModeEnabled = shiftModeEnabled;
     }
 
-    public InputMask getMask() {
-        return inputMask;
-    }
-
     public void setMaskString(String maskString) {
         inputMask.setInputMaskString(maskString);
     }
@@ -37,52 +33,59 @@ public class SimpleMaskFilter {
         return placeholderValid ? placeholderString.charAt(0) : DEFAULT_PLACEHOLDER;
     }
 
-    public EditTextState filter(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
-        boolean noMask = inputMask == null ||
-                inputMask.getInputMaskString() == null ||
-                inputMask.getInputMaskString().isEmpty();
-
-        if (noMask) {
-            return new EditTextState(textAfter, textAfter, selectionStart + replacementLength);
+    public EditTextState filter(TextChangeEvent event) {
+        //Filter should prevent user from inserting text
+        if (shouldAllowFilter(event)) {
+            return null;
         }
 
-        boolean outsideMaskBounds = textAfter.length() > inputMask.getInputMaskString().length()
-                && selectionLength != replacementLength && selectionStart > 0
-                && !inputMask.matches(textAfter);
+        String leftUnformatted = inputMask.unformatText(event.getTextBefore(), 0, event.getSelectionStart());
+        String rightUnformatted = inputMask.unformatText(event.getTextBefore(), event.getSelectionEnd(), event.getTextBefore().length());
 
-        //Undoes what the user entered by returning to previous state
-        if (outsideMaskBounds) {
-            String newUnformattedText = inputMask.unformatText(textBefore, 0, textBefore.length());
-            return new EditTextState(textBefore, newUnformattedText, selectionStart);
-        }
-
-        return calculateUpdatedState(textBefore, textAfter, selectionStart, selectionLength, replacementLength);
-    }
-
-    private EditTextState calculateUpdatedState(String textBefore, String textAfter, int selectionStart, int selectionLength, int replacementLength) {
-        CharSequence insertedText = textAfter.subSequence(selectionStart, selectionStart + replacementLength);
-        String leftUnformatted = inputMask.unformatText(textBefore, 0, selectionStart);
-        String rightUnformatted = inputMask.unformatText(textBefore, selectionStart + selectionLength, textBefore.length());
-
-        boolean backspaced = replacementLength == 0 && selectionLength == 1;
-
-        //Special case where user has backspaced in front of a character added by the input mask
-        //If in shift mode, remove next character to the left
-        if (leftUnformatted.length() > 0 && backspaced &&
-                !inputMask.isPlaceholder(selectionStart) &&
-                shiftModeEnabled) {
+        boolean shouldRemoveLeftCharacter = removeLeftCharacterOnBackspace(event.isBackspace(), leftUnformatted, event.getSelectionStart());
+        if (shouldRemoveLeftCharacter) {
             leftUnformatted = leftUnformatted.substring(0, leftUnformatted.length() - 1);
         }
 
-        String newUnformattedText = leftUnformatted + insertedText + rightUnformatted;
+        String newUnformattedText = leftUnformatted + event.getInsertedText() + rightUnformatted;
         String newFormattedText = inputMask.formatText(newUnformattedText);
 
-        //When user backspaces but is not in shift mode, even if no character ends up removed, the cursor keeps its new position
-        boolean keepCurrentCursorPosition = backspaced && !shiftModeEnabled && leftUnformatted.length() > 0;
+        boolean shouldRetainCursorPosition = retainCursorPositionOnBackspace(event.isBackspace(), leftUnformatted);
+        if (shouldRetainCursorPosition) {
+            return new EditTextState(newFormattedText, newUnformattedText, event.getSelectionStart());
+        }
 
-        int cursorPos = keepCurrentCursorPosition ? selectionStart :
-                inputMask.formatText(leftUnformatted + insertedText).length();
+        int newCursorPos = inputMask.formatText(leftUnformatted + event.getInsertedText()).length();
+        return new EditTextState(newFormattedText, newUnformattedText, newCursorPos);
+    }
 
-        return new EditTextState(newFormattedText, newUnformattedText, cursorPos);
+    public boolean maskEmpty() {
+        return inputMask == null ||
+                inputMask.getInputMaskString() == null ||
+                inputMask.getInputMaskString().isEmpty();
+    }
+
+    private boolean shouldAllowFilter(TextChangeEvent event) {
+        String textAfter = event.getTextAfter();
+        int selectionLength = event.getSelectionEnd() - event.getSelectionStart();
+
+        return  textAfter.length() > inputMask.getInputMaskString().length()
+                && selectionLength != event.getReplacementLength()
+                && event.getSelectionStart() > 0
+                && !inputMask.matches(textAfter);
+    }
+
+    //Special case where user has backspaced in front of a character added by the input mask
+    private boolean removeLeftCharacterOnBackspace(boolean backspaced, String leftText, int selectionStart) {
+        return backspaced && shiftModeEnabled &&
+                leftText.length() > 0 &&
+                !inputMask.isPlaceholder(selectionStart);
+    }
+
+    //When user backspaces but is not in shift mode, even if no character ends up removed, the cursor keeps its new position
+    private boolean retainCursorPositionOnBackspace(boolean backspaced, String leftUnformatted) {
+        return backspaced &&
+                !shiftModeEnabled &&
+                leftUnformatted.length() > 0;
     }
 }
