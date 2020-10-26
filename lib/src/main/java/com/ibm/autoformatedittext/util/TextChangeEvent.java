@@ -25,6 +25,14 @@ public class TextChangeEvent {
         return selectionStart;
     }
 
+    public int getSelectionLength() {
+        return selectionLength;
+    }
+
+    public int getInsertedLength() {
+        return replacementLength;
+    }
+
     public int getSelectionEnd() {
         return selectionStart + selectionLength;
     }
@@ -34,14 +42,6 @@ public class TextChangeEvent {
             removedText = textBefore.substring(selectionStart, getSelectionEnd());
         }
         return removedText;
-    }
-
-    public int getSelectionLength() {
-        return selectionLength;
-    }
-
-    public int getReplacementLength() {
-        return replacementLength;
     }
 
     public String getInsertedText() {

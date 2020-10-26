@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 public class SimpleMaskFilterTest {
     @Test
-    public void filterTest() {
+    public void testFilter() {
         SimpleMaskFilter maskFilter = new SimpleMaskFilter("##/##/##", "#", true);
 
         //Insert at beginning
@@ -42,7 +42,7 @@ public class SimpleMaskFilterTest {
     }
 
     @Test
-    public void filterTest_placeholders() {
+    public void testFilter_placeholders() {
         //Set valid placeholder
         //Set null placeholder
         //Set empty placeholder
@@ -50,13 +50,13 @@ public class SimpleMaskFilterTest {
     }
 
     @Test
-    public void filterTest_noMask() {
+    public void testFilter_noMask() {
         //Null mask
         //Empty mask
     }
 
     @Test
-    public void filterTest_outsideBounds() {
+    public void testFilter_outsideBounds() {
         //Replace smaller length section while complete, outside bounds
         //Insert one while complete, outside bounds
         //Insert many while complete, outside bounds
@@ -65,14 +65,14 @@ public class SimpleMaskFilterTest {
     }
 
     @Test
-    public void filterTest_backspaceNonShift() {
+    public void testFilter_backspaceNonShift() {
         //Backspaced in front of placeholder, non-shiftMode
         //Backspaced in front of non-placeholder, non-shiftMode
         //Backspaced in front of two placeholders, non-shiftMode
     }
 
     @Test
-    public void filterTest_backspaceShiftMode() {
+    public void testFilter_backspaceShiftMode() {
         //Backspaced in front of placeholder, shiftMode
         //Backspaced in front of non-placeholder, shiftMode
         //Backspaced in front of two placeholders, shiftMode

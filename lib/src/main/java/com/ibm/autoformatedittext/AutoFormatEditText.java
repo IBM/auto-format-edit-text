@@ -4,9 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 
-import androidx.databinding.BindingAdapter;
-
-import com.carljmont.lib.R;
+import com.ibm.autoformatedittext.lib.R;
 import com.ibm.autoformatedittext.model.EditTextState;
 import com.ibm.autoformatedittext.util.TextChangeEvent;
 import com.ibm.autoformatedittext.util.HideFormatter;
@@ -16,6 +14,7 @@ import com.ibm.autoformatedittext.util.SimpleMaskFilter;
 public class AutoFormatEditText extends FormattedInputEditText {
     private String hideModeFormat;
     private SimpleMaskFilter simpleMaskFilter;
+    private boolean hideModeEnabled;
 
     public AutoFormatEditText(Context context) {
         super(context);
@@ -37,16 +36,11 @@ public class AutoFormatEditText extends FormattedInputEditText {
             a.recycle();
 
             simpleMaskFilter = new SimpleMaskFilter(inputMaskString, placeholderString, shiftModeEnabled);
-
-            if (inputMaskString != null && inputMaskString.length() > 0) {
-                startFormatting();
-            }
         }
     }
 
     public void setInputMask(String inputMaskString) {
         simpleMaskFilter.setMaskString(inputMaskString);
-        setFormattingEnabled(inputMaskString != null && inputMaskString.length() > 0);
         setText("");
     }
 
@@ -59,45 +53,50 @@ public class AutoFormatEditText extends FormattedInputEditText {
         simpleMaskFilter.setShiftModeEnabled(enabled);
     }
 
-    public void setHideModeFormat(String staticFormat) {
-        this.hideModeFormat = staticFormat;
+    public void setHideModeFormat(String hideModeFormat) {
+        this.hideModeFormat = hideModeFormat;
 
         if (hideModeEnabled) {
             updateHideModeText();
         }
     }
 
+    public void setHideModeEnabled(boolean enabled) {
+        this.hideModeEnabled = enabled;
+
+        if (enabled) {
+            updateHideModeText();
+        }else {
+            setText(unformattedText);
+        }
+    }
+
+    private void updateHideModeText() {
+        String s = HideFormatter.format(unformattedText, hideModeFormat);
+        setTextNoFormat(s);
+    }
+
     @Override
-    public String getHideModeText(String unformattedText, String formattedText) {
-        return HideFormatter.format(unformattedText, hideModeFormat);
+    public boolean formattingEnabled() {
+        return simpleMaskFilter != null &&
+                simpleMaskFilter.getMaskString() != null &&
+                simpleMaskFilter.getMaskString().length() > 0;
     }
 
     @Override
     public EditTextState format(TextChangeEvent textChangeEvent) {
+        if (hideModeEnabled) {
+            return null;
+        }
+
         return simpleMaskFilter.filter(textChangeEvent);
+    }
+
+    public boolean isHideModeEnabled() {
+        return hideModeEnabled;
     }
 
     public SimpleMaskFilter getSimpleMaskFilter() {
         return simpleMaskFilter;
-    }
-
-    @BindingAdapter("inputMask")
-    public static void setInputMask(AutoFormatEditText editText, String maskString) {
-        editText.setInputMask(maskString);
-    }
-
-    @BindingAdapter("inputMaskPlaceholder")
-    public static void setInputMaskPlaceholder(AutoFormatEditText editText, String placeholder) {
-        editText.setInputMaskPlaceholder(placeholder);
-    }
-
-    @BindingAdapter("shiftModeEnabled")
-    public static void setShiftModeEnabled(AutoFormatEditText editText, boolean enabled) {
-        editText.setShiftModeEnabled(enabled);
-    }
-
-    @BindingAdapter("hideModeFormat")
-    public static void setHideModeFormat(AutoFormatEditText editText, String format) {
-        editText.setHideModeFormat(format);
     }
 }

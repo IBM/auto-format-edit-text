@@ -20,6 +20,10 @@ public class SimpleMaskFilter {
         inputMask.setInputMaskString(maskString);
     }
 
+    public String getMaskString() {
+        return inputMask.getInputMaskString();
+    }
+
     public void setPlaceholder(String placeholderString) {
         inputMask.setPlaceholder(getPlaceholder(placeholderString));
     }
@@ -35,7 +39,7 @@ public class SimpleMaskFilter {
 
     public EditTextState filter(TextChangeEvent event) {
         //Filter should prevent user from inserting text
-        if (shouldAllowFilter(event)) {
+        if (shouldDisallowTextEntry(event)) {
             return null;
         }
 
@@ -59,18 +63,12 @@ public class SimpleMaskFilter {
         return new EditTextState(newFormattedText, newUnformattedText, newCursorPos);
     }
 
-    public boolean maskEmpty() {
-        return inputMask == null ||
-                inputMask.getInputMaskString() == null ||
-                inputMask.getInputMaskString().isEmpty();
-    }
-
-    private boolean shouldAllowFilter(TextChangeEvent event) {
+    private boolean shouldDisallowTextEntry(TextChangeEvent event) {
         String textAfter = event.getTextAfter();
         int selectionLength = event.getSelectionEnd() - event.getSelectionStart();
 
         return  textAfter.length() > inputMask.getInputMaskString().length()
-                && selectionLength != event.getReplacementLength()
+                && selectionLength != event.getInsertedLength()
                 && event.getSelectionStart() > 0
                 && !inputMask.matches(textAfter);
     }

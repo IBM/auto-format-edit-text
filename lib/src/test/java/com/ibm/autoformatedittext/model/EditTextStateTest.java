@@ -10,18 +10,39 @@ public class EditTextStateTest {
     private EditTextState testEditTextState = new EditTextState("07/19/1993", "07191993", 0, 5);
 
     @Test
-    public void constructorTest_noRange() {
-        EditTextState testEditTextStateNoRange = new EditTextState("07/19/1993", "07191993", 0);
-        assertEquals(0, testEditTextStateNoRange.getSelectionStart());
-        assertEquals(0, testEditTextStateNoRange.getSelectionEnd());
+    public void testConstructor_noRange() {
+        //Test constructor with no selection range
+        EditTextState editTextState1 = new EditTextState("07/19/1993", "07191993", 0);
+        assertEquals(0, editTextState1.getSelectionStart());
+        assertEquals(0, editTextState1.getSelectionEnd());
+    }
+
+    @Test
+    public void testGetFormattedText() {
+        assertEquals("07/19/1993", testEditTextState.getFormattedText());
+    }
+
+    @Test
+    public void testGetUnformattedText() {
+        assertEquals("07191993", testEditTextState.getUnformattedText());
+    }
+
+    @Test
+    public void testGetSelectionStart() {
+        assertEquals(0, testEditTextState.getSelectionStart());
+    }
+
+    @Test
+    public void testGetSelectionEnd() {
+        assertEquals(5, testEditTextState.getSelectionEnd());
     }
 
     @Test
     public void hashCodeTest() {
         assertEquals(-1157693412, testEditTextState.hashCode());
 
-        EditTextState testEditTextState2 = new EditTextState("", "", 0, 0);
-        assertNotEquals(testEditTextState.hashCode(), testEditTextState2.hashCode());
+        EditTextState editTextState1 = new EditTextState("", "", 0, 0);
+        assertNotEquals(testEditTextState.hashCode(), editTextState1.hashCode());
     }
 
     @Test
@@ -32,19 +53,23 @@ public class EditTextStateTest {
         //noinspection SimplifiableJUnitAssertion,EqualsBetweenInconvertibleTypes
         assertFalse(testEditTextState.equals(""));
 
-        EditTextState testEditTextStateIdentical = new EditTextState("07/19/1993", "07191993", 0, 5);
-        assertEquals(testEditTextState, testEditTextStateIdentical);
+        EditTextState editTextState1 = new EditTextState("07/19/1993", "07191993", 0, 5);
+        assertEquals(testEditTextState, editTextState1);
 
-        EditTextState testEditTextStateDifferentFormatted = new EditTextState("", "07191993", 0, 5);
-        assertNotEquals(testEditTextState, testEditTextStateDifferentFormatted);
+        //Different formatted text
+        EditTextState editTextState2 = new EditTextState("", "07191993", 0, 5);
+        assertNotEquals(testEditTextState, editTextState2);
 
-        EditTextState testEditTextStateDifferentUnformatted = new EditTextState("07/19/1993", "", 0, 5);
-        assertNotEquals(testEditTextState, testEditTextStateDifferentUnformatted);
+        //Different unformatted text
+        EditTextState editTextState3 = new EditTextState("07/19/1993", "", 0, 5);
+        assertNotEquals(testEditTextState, editTextState3);
 
-        EditTextState testEditTextStateDifferentStart = new EditTextState("07/19/1993", "07191993", 5, 5);
-        assertNotEquals(testEditTextState, testEditTextStateDifferentStart);
+        //Different selection start
+        EditTextState editTextState4 = new EditTextState("07/19/1993", "07191993", 5, 5);
+        assertNotEquals(testEditTextState, editTextState4);
 
-        EditTextState testEditTextStateDifferentEnd = new EditTextState("07/19/1993", "07191993", 0, 0);
-        assertNotEquals(testEditTextState, testEditTextStateDifferentEnd);
+        //Different selection end
+        EditTextState editTextState5 = new EditTextState("07/19/1993", "07191993", 0, 0);
+        assertNotEquals(testEditTextState, editTextState5);
     }
 }

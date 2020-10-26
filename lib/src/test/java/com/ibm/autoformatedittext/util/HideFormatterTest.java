@@ -1,4 +1,4 @@
-package com.ibm.autoformatedittext.model;
+package com.ibm.autoformatedittext.util;
 
 import com.ibm.autoformatedittext.util.HideFormatter;
 

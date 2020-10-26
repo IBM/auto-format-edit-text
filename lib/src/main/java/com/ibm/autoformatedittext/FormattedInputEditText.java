@@ -22,8 +22,8 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
     private ChangeListener changeListener;
     private TextWatcher textWatcher;
 
-    public boolean hideModeEnabled;
-    private String textBefore, formattedText, unformattedText;
+    private String textBefore;
+    public String formattedText, unformattedText;
 
     public FormattedInputEditText(Context context) {
         super(context);
@@ -35,8 +35,8 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
         init(context, attrs);
     }
 
-    public abstract String getHideModeText(String unformattedText, String formattedText);
     public abstract EditTextState format(TextChangeEvent textChangeEvent);
+    public abstract boolean formattingEnabled();
 
     public void init(Context context, AttributeSet attrs) {
         //Prevents edge case where multiple callbacks are occurring for input type 'text'
@@ -44,6 +44,12 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
                 getInputType() == InputType.TYPE_CLASS_TEXT || getInputType() == InputType.TYPE_TEXT_FLAG_MULTI_LINE) {
             setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
         }
+
+        startWatching();
+    }
+
+    private void startWatching() {
+        removeTextChangedListener(textWatcher);
 
         textWatcher = new TextWatcher() {
             @Override
@@ -59,34 +65,8 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
             @Override
             public void afterTextChanged(Editable s) {}
         };
-    }
 
-    public void setHideModeEnabled(boolean enabled) {
-        this.hideModeEnabled = enabled;
-
-        if (enabled) {
-            updateHideModeText();
-        }else {
-            setNewText(unformattedText);
-        }
-    }
-
-    public void updateHideModeText() {
-        String s = getHideModeText(unformattedText, formattedText);
-        setTextNoFormat(s);
-    }
-
-    public void setFormattingEnabled(boolean shouldListen) {
-        removeTextChangedListener(textWatcher);
-
-        if (shouldListen) {
-            addTextChangedListener(textWatcher);
-        }
-    }
-
-    //Call is required by a subclass before this class will call format method
-    public void startFormatting() {
-        setFormattingEnabled(true);
+        addTextChangedListener(textWatcher);
     }
 
     @Override
@@ -97,55 +77,46 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
     }
 
     private void handleOnTextChanged(CharSequence s, int start, int before, int count) {
-        if (hideModeEnabled) {
-            setTextNoFormat(textBefore);
-            setSelection(start + before);
+        if (!formattingEnabled()) {
             return;
         }
 
         TextChangeEvent textChangeEvent = new TextChangeEvent(textBefore, s.toString(), start, before, count);
-        EditTextState newEditTextState = format(textChangeEvent);
+        EditTextState editTextState = format(textChangeEvent);
 
-        if (newEditTextState == null) {
+        if (editTextState == null) {
             setTextNoFormat(textBefore);
             setSelection(start + before);
             return;
         }
 
-        if (newEditTextState != null) {
-            boolean formattedTextChanged = formattedText == null || !formattedText.equals(newEditTextState.getFormattedText());
-            if (formattedTextChanged) {
-                formattedText = newEditTextState.getFormattedText();
-            }
+        boolean formattedTextChanged = formattedText == null || !formattedText.equals(editTextState.getFormattedText());
+        if (formattedTextChanged) {
+            formattedText = editTextState.getFormattedText();
+        }
 
-            boolean unformattedTextChanged= unformattedText == null || !unformattedText.equals(newEditTextState.getUnformattedText());
-            if (unformattedTextChanged) {
-                unformattedText = newEditTextState.getUnformattedText();
-            }
+        boolean unformattedTextChanged = unformattedText == null || !unformattedText.equals(editTextState.getUnformattedText());
+        if (unformattedTextChanged) {
+            unformattedText = editTextState.getUnformattedText();
+        }
 
-            setTextNoFormat(formattedText); //Unformatted text must be set beforehand
+        setTextNoFormat(formattedText); //Unformatted text must be set beforehand
 
-            //When we set the text programmatically, the cursor returns to position 0. This repositions the cursor/selection
-            setSelection(newEditTextState.getSelectionStart(), newEditTextState.getSelectionEnd());
+        //When we set the text programmatically, the cursor returns to position 0. This repositions the cursor/selection
+        setSelection(editTextState.getSelectionStart(), editTextState.getSelectionEnd());
 
-            if (changeListener != null &&
-                    (formattedTextChanged || unformattedTextChanged)) {
-                changeListener.onValueChanged(unformattedText, formattedText);
-            }
+        if (changeListener != null &&
+                (formattedTextChanged || unformattedTextChanged)) {
+            changeListener.onValueChanged(unformattedText, formattedText);
         }
     }
 
     public void setTextNoFormat(String s) {
         removeTextChangedListener(textWatcher); //Removing/re-adding listener will prevent never ending loop
-        setNewText(s);
-        addTextChangedListener(textWatcher);
-    }
-
-    public void setNewText(CharSequence s) {
-        if (s != null && getText() != null &&
-                !getText().toString().equals(s.toString())) {
+        if (s != null && !s.equals(getText().toString())) {
             setText(s);
         }
+        addTextChangedListener(textWatcher);
     }
 
     public ChangeListener getChangeListener() {
@@ -154,10 +125,6 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
 
     public TextWatcher getTextWatcher() {
         return textWatcher;
-    }
-
-    public boolean getHideModeEnabled() {
-        return hideModeEnabled;
     }
 
     public String getUnformattedText() {
@@ -173,13 +140,10 @@ public abstract class FormattedInputEditText extends AppCompatEditText {
     }
 
     @BindingAdapter("android:text")
-    public static void setTextAndroid(FormattedInputEditText editText, String newText) {
-        editText.setNewText(newText);
-    }
-
-    @BindingAdapter("hideModeEnabled")
-    public static void setHideModeEnabled(AutoFormatEditText editText, boolean enabled) {
-        editText.setHideModeEnabled(enabled);
+    public static void setTextAndroid(FormattedInputEditText editText, String s) {
+        if (s != null && !s.equals(editText.getText().toString())) {
+            editText.setText(s);
+        }
     }
 
     public interface ChangeListener {
