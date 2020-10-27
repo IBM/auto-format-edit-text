@@ -20,7 +20,6 @@
             android:layout_height="wrap_content"
             android:typeface="monospace"
             android:hint="@{observable.inputMask}"
-            android:text="@={observable.formattedText}"
             android:enabled="@{observable.inputEnabled}"
             app:onValueChanged="@{observable::onValueChanged}"
             app:inputMask="@{observable.inputMask}"

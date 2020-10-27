@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class FormatObservable {
     public ObservableField<String> formattedText = new ObservableField<>("");
-    public ObservableField<String> unformattedText = new ObservableField<>("0000000000");
+    public ObservableField<String> unformattedText = new ObservableField<>("");
     public ObservableField<String> inputMask = new ObservableField<>("(###) ###-####");
     public ObservableField<String> hideModeFormat = new ObservableField<>("([0]**) ***-[6-9]");
     public ObservableField<Boolean> inputEnabled = new ObservableField<>(true);
@@ -16,18 +16,19 @@ public class FormatObservable {
     public ObservableField<Boolean> hideModeEnabled = new ObservableField<>(false);
 
     public void onValueChanged(String unformattedText, String formattedText) {
-        Log.i("FormatObservable", "Unformatted: " + unformattedText + ", Formatted: " + formattedText);
+        this.unformattedText.set(unformattedText);
+        this.formattedText.set(formattedText);
     }
 
     public void onToggleInputEnabledClick(View v) {
-        inputEnabled.set(!Objects.requireNonNull(inputEnabled.get()));
+        inputEnabled.set(!inputEnabled.get());
     }
 
     public void onShiftModeToggleClick(View v) {
-        shiftModeEnabled.set(!Objects.requireNonNull(shiftModeEnabled.get()));
+        shiftModeEnabled.set(!shiftModeEnabled.get());
     }
 
     public void onHideModeToggleClick(View v) {
-        hideModeEnabled.set(!Objects.requireNonNull(hideModeEnabled.get()));
+        hideModeEnabled.set(!hideModeEnabled.get());
     }
 }
